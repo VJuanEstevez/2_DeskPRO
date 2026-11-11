@@ -1,0 +1,113 @@
+.app--pomodoro {
+  max-width: 56rem;
+}
+
+.pomodoro__status {
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.pomodoro__layout {
+  display: grid;
+  gap: var(--space-5);
+  justify-items: center;
+}
+
+.pomodoro__phases {
+  justify-self: center;
+}
+
+.pomodoro__timer {
+  display: grid;
+  gap: var(--space-5);
+  justify-items: center;
+  width: min(100%, 26rem);
+}
+
+.pomodoro__ring {
+  position: relative;
+  width: min(15rem, 70vw);
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    transform: rotate(-90deg);
+  }
+}
+
+.pomodoro__track {
+  fill: none;
+  stroke: var(--surface-2);
+  stroke-width: 9;
+}
+
+.pomodoro__progress {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 9;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 250ms linear;
+}
+
+.pomodoro__readout {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-1);
+}
+
+.pomodoro__time {
+  font-size: 2.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.pomodoro__phase {
+  font-size: 0.875rem;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.pomodoro__controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.pomodoro__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.stat {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.stat__value {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.stat__label {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}

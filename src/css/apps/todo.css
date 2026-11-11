@@ -1,0 +1,75 @@
+.app--todo {
+  max-width: 52rem;
+}
+
+.todo__count {
+  font-size: 0.9375rem;
+  font-weight: 650;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.todo__form {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.todo__row {
+  display: flex;
+  gap: var(--space-2);
+
+  .field__control {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.todo__list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.todo__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition);
+
+  &:hover {
+    border-color: var(--border-strong);
+  }
+}
+
+.todo__check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.todo__checkbox {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: none;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.todo__text {
+  overflow-wrap: anywhere;
+}
+
+.todo__item.is-done .todo__text {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.todo__remove {
+  margin-left: auto;
+}

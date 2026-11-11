@@ -1,0 +1,824 @@
+/* ==========================================================================
+   DeskPRO — fixed header, lateral navigation and dashboard grid
+   ========================================================================== */
+
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  height: var(--header-height);
+  padding: 0 var(--space-5);
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.app-header__start {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.brand__mark {
+  flex: none;
+}
+
+.brand__name {
+  font-size: 1.5rem;
+}
+
+.app-header__greeting {
+  padding-left: var(--space-5);
+  font-size: 1.375rem;
+  font-weight: 650;
+  color: var(--text);
+  border-left: 1px solid var(--border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-header__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.app-header__clock {
+  display: grid;
+  justify-items: end;
+  line-height: 1.15;
+}
+
+.app-header__time {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.app-header__date {
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+/* Location badge, pinned to the bottom right corner of the viewport. */
+.app-location {
+  position: fixed;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: min(20rem, calc(100vw - 2 * var(--space-4)));
+  padding: var(--space-2) var(--space-3);
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow);
+
+  .icon {
+    width: 1rem;
+    height: 1rem;
+    flex: none;
+    color: var(--accent);
+  }
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Lateral navigation (fixed, left side)
+   -------------------------------------------------------------------------- */
+
+.side-nav {
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  bottom: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: var(--nav-width);
+  padding: var(--space-3) var(--space-2);
+  overflow-y: auto;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+}
+
+.side-nav__list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.side-nav__list--footer {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+}
+
+.side-nav__link {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  padding: var(--space-2) var(--space-1);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+
+  &:hover {
+    color: var(--text);
+    background: var(--surface-2);
+  }
+}
+
+.side-nav__icon {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.side-nav__link[aria-current='page'] {
+  color: var(--accent);
+  background: var(--surface-2);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+/* Label is always exposed to assistive tech; the visual tooltip is built in JS. */
+.side-nav__label {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 0.5rem);
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Tooltip that follows the navigation icons (created by nav.js). */
+.nav-tooltip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 60;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Main view
+   -------------------------------------------------------------------------- */
+
+.view {
+  min-height: calc(100vh - var(--header-height));
+
+  &:focus {
+    outline: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Dashboard cards
+   -------------------------------------------------------------------------- */
+
+.dashboard__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr));
+  gap: var(--space-4);
+}
+
+.dashboard__card {
+  position: relative;
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  padding: var(--space-4) var(--space-5);
+  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+    box-shadow: var(--shadow);
+  }
+
+  &:focus-within {
+    border-color: var(--accent);
+  }
+}
+
+.dashboard__title {
+  font-size: 1.0625rem;
+  font-weight: 650;
+}
+
+/* The whole card is clickable, but the widget content stays interactive. */
+.dashboard__link {
+  color: inherit;
+  text-decoration: none;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  &:focus-visible {
+    outline: none;
+
+    &::after {
+      outline: 2px solid var(--accent);
+      outline-offset: -3px;
+    }
+  }
+}
+
+/* Big widget area: capped in height so overflowing content scrolls vertically. */
+.dashboard__widget {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  max-height: min(24rem, 60vh);
+  padding-top: var(--space-3);
+  border-top: 1px dashed var(--border);
+  /* The stretched title link lives underneath: only real controls catch clicks. */
+  pointer-events: none;
+}
+
+.dashboard__widget :is(a, button, input, label, select, textarea, form, fieldset, output, .widget-list, .widget-player__frame) {
+  pointer-events: auto;
+}
+
+/* --------------------------------------------------------------------------
+   Dashboard widget content
+   -------------------------------------------------------------------------- */
+
+.widget-status,
+.widget-empty {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.widget-form {
+  display: flex;
+  gap: var(--space-2);
+
+  .field__control {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .button {
+    flex: none;
+  }
+}
+
+.widget-list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.widget-list__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.875rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.widget-list__label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+
+  input {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.widget-list__button {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+
+  &:hover .widget-list__title {
+    color: var(--accent);
+  }
+}
+
+.widget-list__title {
+  flex: 1;
+  min-width: 0;
+  font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.widget-list__meta {
+  flex: none;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Calendar ---------------------------------------------------------------- */
+
+.widget-calendar {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.widget-calendar__month {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 650;
+  text-transform: capitalize;
+}
+
+.widget-calendar__weekdays,
+.widget-calendar__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.widget-calendar__weekdays {
+  font-size: 0.625rem;
+  font-weight: 650;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.widget-calendar__day {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 1.75rem;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  border-radius: var(--radius-full);
+}
+
+.widget-calendar__day--outside {
+  visibility: hidden;
+}
+
+.widget-calendar__day.is-today {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+}
+
+.widget-calendar__day.has-events {
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.widget-calendar__day.has-events::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  width: 3px;
+  height: 3px;
+  background: var(--accent);
+  border-radius: var(--radius-full);
+}
+
+.widget-calendar__day.is-today.has-events::after {
+  background: var(--on-accent);
+}
+
+.widget-calendar__summary {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Pomodoro ---------------------------------------------------------------- */
+
+.widget-pomodoro {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+}
+
+.widget-pomodoro__ring {
+  position: relative;
+  width: 9rem;
+}
+
+.widget-pomodoro__ring svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform: rotate(-90deg);
+}
+
+.widget-pomodoro__track {
+  fill: none;
+  stroke: var(--surface-2);
+  stroke-width: 10;
+}
+
+.widget-pomodoro__progress {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.35s linear;
+}
+
+.widget-pomodoro__readout {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 2px;
+  text-align: center;
+}
+
+.widget-pomodoro__time {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.widget-pomodoro__phase {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.widget-pomodoro__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* Weather ----------------------------------------------------------------- */
+
+.widget-weather {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.widget-weather__icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  color: var(--accent);
+}
+
+.widget-weather__body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.widget-weather__temp {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.widget-weather__condition {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.widget-weather__place {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Player ------------------------------------------------------------------ */
+
+.widget-player {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.widget-player__frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #000;
+  border-radius: var(--radius-md);
+}
+
+.widget-player__frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.widget-player__placeholder {
+  margin: 0;
+  padding: var(--space-4);
+  font-size: 0.8125rem;
+  text-align: center;
+  color: #9db0c4;
+}
+
+.widget-player__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.widget-player__title {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.widget-player__toggle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Favorites --------------------------------------------------------------- */
+
+.widget-favorite {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+
+  .icon {
+    flex: none;
+    color: var(--text-muted);
+  }
+
+  &:hover {
+    color: var(--accent);
+
+    .icon {
+      color: var(--accent);
+    }
+  }
+}
+
+.widget-favorite__logo {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.widget-favorite__name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Password ---------------------------------------------------------------- */
+
+.widget-password {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.widget-password__toggles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  gap: var(--space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.widget-password__result {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.widget-password__value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  word-break: break-all;
+  color: var(--accent);
+}
+
+.widget-password__meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 60rem) {
+  .app-header__date {
+    display: none;
+  }
+}
+
+@media (max-width: 47.99rem) {
+  body {
+    padding-left: 0;
+    padding-bottom: 4.5rem;
+  }
+
+  .app-header {
+    height: auto;
+    min-height: 4.5rem;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .app-header__greeting {
+    display: none;
+  }
+
+  .app-header__meta {
+    gap: var(--space-3);
+    font-size: 0.8125rem;
+  }
+
+  /* Keep the location badge clear of the bottom navigation bar. */
+  .app-location {
+    bottom: calc(4.5rem + var(--space-2));
+    max-width: calc(100vw - 2 * var(--space-3));
+    font-size: 0.75rem;
+  }
+
+  .side-nav {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-1);
+    width: auto;
+    height: 4.5rem;
+    padding: var(--space-1) var(--space-2);
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-top: 1px solid var(--border);
+    border-right: 0;
+  }
+
+  .side-nav__list {
+    grid-auto-flow: column;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .side-nav__list--footer {
+    margin-left: auto;
+    padding-top: 0;
+    padding-left: var(--space-2);
+    border-top: 0;
+    border-left: 1px solid var(--border);
+  }
+
+  .side-nav__link {
+    padding: var(--space-1) var(--space-2);
+    min-width: 3.25rem;
+  }
+
+  .side-nav__link[aria-current='page'] {
+    box-shadow: inset 0 -3px 0 var(--accent);
+  }
+
+  .side-nav__label {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0;
+    clip-path: none;
+    font-size: 0.625rem;
+    color: inherit;
+  }
+
+  .app {
+    padding: var(--space-4) var(--space-3) var(--space-6);
+  }
+
+  .toast-region {
+    bottom: 5.25rem;
+    left: var(--space-3);
+    right: var(--space-3);
+    max-width: none;
+  }
+}
