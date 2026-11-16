@@ -11,6 +11,9 @@ export const APPS = [
   { id: 'player', label: 'Reproductor', icon: 'icon-play' },
   { id: 'favorites', label: 'Favoritos', icon: 'icon-star' },
   { id: 'password', label: 'Contraseñas', icon: 'icon-key' },
+  { id: 'typography', label: 'Tipografía', icon: 'icon-type' },
+  { id: 'color', label: 'Color', icon: 'icon-palette' },
+  { id: 'textgen', label: 'Texto', icon: 'icon-text' },
 ];
 
 /**

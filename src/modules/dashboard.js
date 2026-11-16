@@ -1,25 +1,38 @@
-import { selectApps } from './settings.js';
+import { selectApps, getSettings } from './settings.js';
 import { subscribe } from './store.js';
 import { WIDGETS } from './widgets.js';
 import { icon, escapeHtml } from './ui.js';
 
 /**
  * Dashboard view: a grid of application cards with live mini widgets.
- * Repaints itself whenever the visible applications change.
+ * Repaints itself whenever the visible applications change and keeps the
+ * column layout in sync with the value saved from the settings dialog.
  */
 export default {
   meta: { title: 'Panel' },
   render(root) {
     let widgetCleanups = [];
+    let appsSignature = null;
 
     const unmountWidgets = () => {
       for (const cleanup of widgetCleanups) cleanup();
       widgetCleanups = [];
     };
 
+    const signatureFor = (apps) => apps.map((app) => app.id).join('|');
+
+    const paintColumns = () => {
+      const grid = root.querySelector('.dashboard__grid');
+      if (!grid) return;
+
+      const columns = getSettings().gridColumns;
+      grid.style.setProperty('--dashboard-columns', String(columns));
+    };
+
     const paint = () => {
       unmountWidgets();
       const apps = selectApps();
+      appsSignature = signatureFor(apps);
 
       if (apps.length === 0) {
         root.innerHTML = `
@@ -59,6 +72,8 @@ export default {
           </div>
         </section>`;
 
+      paintColumns();
+
       widgetCleanups = [...root.querySelectorAll('[data-widget]')]
         .map((node) => {
           const factory = WIDGETS[node.dataset.widget];
@@ -72,7 +87,11 @@ export default {
     };
 
     paint();
-    const unsubscribe = subscribe('settings', paint);
+    const unsubscribe = subscribe('settings', () => {
+      const apps = selectApps();
+      if (signatureFor(apps) !== appsSignature) paint();
+      else paintColumns();
+    });
 
     return () => {
       unsubscribe();

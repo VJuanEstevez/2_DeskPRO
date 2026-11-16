@@ -1,0 +1,182 @@
+{
+  "package.json": {
+    "mtime": 1794310058.3477821,
+    "seen": 1794846272.584457,
+    "ast_hash": "83b2b2744b0f65125d97a41b47ce1ce3",
+    "semantic_hash": "83b2b2744b0f65125d97a41b47ce1ce3"
+  },
+  "src/.oxlintrc.json": {
+    "mtime": 1794226568.6108658,
+    "seen": 1794846272.584467,
+    "ast_hash": "9ab7e4b172793c8010ca9dbedc99cbd5",
+    "semantic_hash": "9ab7e4b172793c8010ca9dbedc99cbd5"
+  },
+  "src/main.js": {
+    "mtime": 1794231609.9965978,
+    "seen": 1794846272.584471,
+    "ast_hash": "d40b420a39e608c4d73db0f99dfe3fad",
+    "semantic_hash": "d40b420a39e608c4d73db0f99dfe3fad"
+  },
+  "src/modules/api/weather.js": {
+    "mtime": 1794229998.32533,
+    "seen": 1794846272.584474,
+    "ast_hash": "e9beb2a3df6ff9503aef453c47bbbfc5",
+    "semantic_hash": "e9beb2a3df6ff9503aef453c47bbbfc5"
+  },
+  "src/modules/api/youtube.js": {
+    "mtime": 1794229998.3253248,
+    "seen": 1794846272.584477,
+    "ast_hash": "7ed8225a30689ea8fc7a0a54c0360d36",
+    "semantic_hash": "7ed8225a30689ea8fc7a0a54c0360d36"
+  },
+  "src/modules/apps/calendar.js": {
+    "mtime": 1794238360.5660737,
+    "seen": 1794846272.584479,
+    "ast_hash": "00591d56923c7baa54feabe287533e4c",
+    "semantic_hash": "00591d56923c7baa54feabe287533e4c"
+  },
+  "src/modules/apps/color.js": {
+    "mtime": 1794412402.7116973,
+    "seen": 1794846272.584481,
+    "ast_hash": "8d5d47735a573a47073d973d51967e0c",
+    "semantic_hash": "8d5d47735a573a47073d973d51967e0c"
+  },
+  "src/modules/apps/favorites.js": {
+    "mtime": 1794240226.5900526,
+    "seen": 1794846272.584484,
+    "ast_hash": "3da1fd5c5448c5fe31aae43c8c1107f0",
+    "semantic_hash": "3da1fd5c5448c5fe31aae43c8c1107f0"
+  },
+  "src/modules/apps/notebook.js": {
+    "mtime": 1794234280.8673282,
+    "seen": 1794846272.5844858,
+    "ast_hash": "5b1342741dc7eaf1810e1feaddac2f9b",
+    "semantic_hash": "5b1342741dc7eaf1810e1feaddac2f9b"
+  },
+  "src/modules/apps/password.js": {
+    "mtime": 1794240147.0869935,
+    "seen": 1794846272.584488,
+    "ast_hash": "836475de13bbde76e1bff0b300ddb6a8",
+    "semantic_hash": "836475de13bbde76e1bff0b300ddb6a8"
+  },
+  "src/modules/apps/player.js": {
+    "mtime": 1794240126.053776,
+    "seen": 1794846272.584491,
+    "ast_hash": "366d5dbb255fa227343f7d17b3a86178",
+    "semantic_hash": "366d5dbb255fa227343f7d17b3a86178"
+  },
+  "src/modules/apps/pomodoro.js": {
+    "mtime": 1794240226.5921805,
+    "seen": 1794846272.5844932,
+    "ast_hash": "4c1356601e099dd88c3f5b431fedfce0",
+    "semantic_hash": "4c1356601e099dd88c3f5b431fedfce0"
+  },
+  "src/modules/apps/textgen.js": {
+    "mtime": 1794412608.1613805,
+    "seen": 1794846272.584495,
+    "ast_hash": "2153c48fdaf6dce5511f8feab313a288",
+    "semantic_hash": "2153c48fdaf6dce5511f8feab313a288"
+  },
+  "src/modules/apps/todo.js": {
+    "mtime": 1794234449.0393736,
+    "seen": 1794846272.584498,
+    "ast_hash": "f05597ef45bbb1265cec5721412a1c0d",
+    "semantic_hash": "f05597ef45bbb1265cec5721412a1c0d"
+  },
+  "src/modules/apps/typography.js": {
+    "mtime": 1794411705.8003743,
+    "seen": 1794846272.5845,
+    "ast_hash": "2d8b07d55d2a61776626b10a05176a0e",
+    "semantic_hash": "2d8b07d55d2a61776626b10a05176a0e"
+  },
+  "src/modules/apps/weather.js": {
+    "mtime": 1794240117.9291563,
+    "seen": 1794846272.584502,
+    "ast_hash": "e1b8d765f487ad7343a3ab6475b5379d",
+    "semantic_hash": "e1b8d765f487ad7343a3ab6475b5379d"
+  },
+  "src/modules/dashboard.js": {
+    "mtime": 1794838115.216338,
+    "seen": 1794846272.5845041,
+    "ast_hash": "2641e8231e639d27ececb94d2f1e2a40",
+    "semantic_hash": "2641e8231e639d27ececb94d2f1e2a40"
+  },
+  "src/modules/data/cities.js": {
+    "mtime": 1794229854.2042422,
+    "seen": 1794846272.584506,
+    "ast_hash": "d7fc237124557b8f460e304ac5dfa8af",
+    "semantic_hash": "d7fc237124557b8f460e304ac5dfa8af"
+  },
+  "src/modules/data/fonts.js": {
+    "mtime": 1794411656.6460915,
+    "seen": 1794846272.584508,
+    "ast_hash": "d125be69e31b0b1014e706cb507e9331",
+    "semantic_hash": "d125be69e31b0b1014e706cb507e9331"
+  },
+  "src/modules/data/text-themes.js": {
+    "mtime": 1794412059.6241975,
+    "seen": 1794846272.5845098,
+    "ast_hash": "a95b8783ecbd444bdc00f898502fbb89",
+    "semantic_hash": "a95b8783ecbd444bdc00f898502fbb89"
+  },
+  "src/modules/header.js": {
+    "mtime": 1794229944.3688507,
+    "seen": 1794846272.584512,
+    "ast_hash": "a5f92d37f99bf8aad0e5104e2729072f",
+    "semantic_hash": "a5f92d37f99bf8aad0e5104e2729072f"
+  },
+  "src/modules/location.js": {
+    "mtime": 1794229930.0368476,
+    "seen": 1794846272.5845141,
+    "ast_hash": "817c3cbec1dba024ce2deac6ad93b817",
+    "semantic_hash": "817c3cbec1dba024ce2deac6ad93b817"
+  },
+  "src/modules/nav.js": {
+    "mtime": 1794250105.8954117,
+    "seen": 1794846272.584517,
+    "ast_hash": "c0b7a4c4cc50f69c63bda0bfda3043a7",
+    "semantic_hash": "c0b7a4c4cc50f69c63bda0bfda3043a7"
+  },
+  "src/modules/registry.js": {
+    "mtime": 1794412151.829066,
+    "seen": 1794846272.5845199,
+    "ast_hash": "0df30bac05efc66187c3cd32f3edae24",
+    "semantic_hash": "0df30bac05efc66187c3cd32f3edae24"
+  },
+  "src/modules/router.js": {
+    "mtime": 1794412155.7226372,
+    "seen": 1794846272.584522,
+    "ast_hash": "de3ed17b82f2b1f5b6719355d7cf1fd3",
+    "semantic_hash": "de3ed17b82f2b1f5b6719355d7cf1fd3"
+  },
+  "src/modules/settings.js": {
+    "mtime": 1794838106.3559623,
+    "seen": 1794846272.584524,
+    "ast_hash": "442a1746af96ddef22bd8c709c7a1894",
+    "semantic_hash": "442a1746af96ddef22bd8c709c7a1894"
+  },
+  "src/modules/store.js": {
+    "mtime": 1794229772.4589634,
+    "seen": 1794846272.584526,
+    "ast_hash": "7a4e02e2409babbc82c26087db31f222",
+    "semantic_hash": "7a4e02e2409babbc82c26087db31f222"
+  },
+  "src/modules/ui.js": {
+    "mtime": 1794240226.590145,
+    "seen": 1794846272.584528,
+    "ast_hash": "70f721970f1ff4000ea1591781f25282",
+    "semantic_hash": "70f721970f1ff4000ea1591781f25282"
+  },
+  "src/modules/widgets.js": {
+    "mtime": 1794838259.8977387,
+    "seen": 1794846272.5845299,
+    "ast_hash": "6b5c2a8e030d3c7afdb81ee170262d00",
+    "semantic_hash": "6b5c2a8e030d3c7afdb81ee170262d00"
+  },
+  "vite.config.js": {
+    "mtime": 1794398018.3751752,
+    "seen": 1794846272.584532,
+    "ast_hash": "9af4cbddd70756deb46e144c0fa48e86",
+    "semantic_hash": "9af4cbddd70756deb46e144c0fa48e86"
+  }
+}

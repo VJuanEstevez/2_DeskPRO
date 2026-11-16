@@ -233,9 +233,13 @@
    Dashboard cards
    -------------------------------------------------------------------------- */
 
+.app--dashboard {
+  max-width: 96rem;
+}
+
 .dashboard__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr));
+  grid-template-columns: repeat(var(--dashboard-columns, 3), minmax(0, 1fr));
   gap: var(--space-4);
 }
 
@@ -244,6 +248,7 @@
   display: grid;
   gap: var(--space-3);
   align-content: start;
+  min-width: 0;
   padding: var(--space-4) var(--space-5);
   transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
 
@@ -404,6 +409,59 @@
   white-space: nowrap;
 }
 
+.widget-list__actions {
+  display: flex;
+  flex: none;
+  gap: var(--space-1);
+}
+
+.widget-list__edit {
+  flex: 1;
+  min-width: 0;
+  padding: 0.3rem 0.5rem;
+  font: inherit;
+  font-size: 0.875rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+}
+
+.widget-note {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.widget-note__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.widget-note__title {
+  min-width: 0;
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.widget-note__body {
+  min-height: 6.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.widget-note__meta {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
 /* Calendar ---------------------------------------------------------------- */
 
 .widget-calendar {
@@ -411,10 +469,18 @@
   gap: var(--space-2);
 }
 
+.widget-calendar__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
 .widget-calendar__month {
   margin: 0;
   font-size: 0.875rem;
   font-weight: 650;
+  text-align: center;
   text-transform: capitalize;
 }
 
@@ -541,32 +607,38 @@
 
 .widget-pomodoro__actions {
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
   gap: var(--space-2);
 }
 
 /* Weather ----------------------------------------------------------------- */
 
 .widget-weather {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  padding-block: var(--space-2);
+  text-align: center;
 }
 
 .widget-weather__icon {
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 4rem;
+  height: 4rem;
   color: var(--accent);
 }
 
 .widget-weather__body {
   display: grid;
+  justify-items: center;
   gap: 2px;
+  max-width: 100%;
   min-width: 0;
 }
 
 .widget-weather__temp {
   margin: 0;
-  font-size: 1.75rem;
+  font-size: 2.5rem;
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -575,10 +647,11 @@
 
 .widget-weather__condition {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
 }
 
 .widget-weather__place {
+  max-width: 100%;
   margin: 0;
   font-size: 0.75rem;
   color: var(--text-muted);
@@ -643,40 +716,76 @@
 
 /* Favorites --------------------------------------------------------------- */
 
-.widget-favorite {
-  display: flex;
-  align-items: center;
+.widget-favorites {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
   gap: var(--space-2);
-  flex: 1;
+}
+
+.widget-favorite-card {
+  display: grid;
+  gap: var(--space-1);
+  align-content: start;
   min-width: 0;
+  padding: var(--space-3);
   color: inherit;
   text-decoration: none;
-
-  .icon {
-    flex: none;
-    color: var(--text-muted);
-  }
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
 
   &:hover {
-    color: var(--accent);
+    transform: translateY(-2px);
+    border-color: var(--accent);
+    box-shadow: var(--shadow);
 
-    .icon {
+    .widget-favorite-card__external {
       color: var(--accent);
     }
   }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
 }
 
-.widget-favorite__logo {
+.widget-favorite-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.widget-favorite-card__logo {
   flex: none;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
+  background: var(--surface);
   border-radius: var(--radius-sm);
 }
 
-.widget-favorite__name {
-  flex: 1;
+.widget-favorite-card__external {
+  flex: none;
+  color: var(--text-muted);
+}
+
+.widget-favorite-card__name {
   min-width: 0;
+  font-size: 0.875rem;
   font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.widget-favorite-card__host {
+  min-width: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -728,6 +837,10 @@
 @media (max-width: 60rem) {
   .app-header__date {
     display: none;
+  }
+
+  .dashboard__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -813,6 +926,10 @@
 
   .app {
     padding: var(--space-4) var(--space-3) var(--space-6);
+  }
+
+  .dashboard__grid {
+    grid-template-columns: 1fr;
   }
 
   .toast-region {

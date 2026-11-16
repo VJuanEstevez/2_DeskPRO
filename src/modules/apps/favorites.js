@@ -75,7 +75,11 @@ function render() {
             data-fallback="${FALLBACK_LOGO}"
           />
           <span class="favorite__body">
-            <span class="favorite__name">${escapeHtml(favorite.name)}</span>
+            ${
+              favorite.name && favorite.name !== favorite.host
+                ? `<span class="favorite__name">${escapeHtml(favorite.name)}</span>`
+                : ''
+            }
             <span class="favorite__host">${escapeHtml(favorite.host)}</span>
           </span>
           ${icon('icon-external', { size: 16, className: 'favorite__external' })}
@@ -116,10 +120,6 @@ export default {
 
         <form class="favorites__form" id="favorites-form">
           <div class="field">
-            <label class="field__label" for="favorite-name">Nombre</label>
-            <input class="field__control" id="favorite-name" name="name" type="text" maxlength="40" placeholder="Ej. Documentación" autocomplete="off" required />
-          </div>
-          <div class="field">
             <label class="field__label" for="favorite-url">URL</label>
             <input class="field__control" id="favorite-url" name="url" type="text" inputmode="url" placeholder="https://ejemplo.com" autocomplete="off" required />
           </div>
@@ -137,7 +137,6 @@ export default {
     form.addEventListener('submit', (event) => {
       event.preventDefault();
       const data = new FormData(form);
-      const name = String(data.get('name') || '').trim();
       const normalized = normalizeUrl(String(data.get('url') || ''));
 
       if (!normalized) {
@@ -153,7 +152,7 @@ export default {
 
       favorites.unshift({
         id: uid(),
-        name: name || normalized.host,
+        name: normalized.host,
         url: normalized.url,
         host: normalized.host,
         createdAt: Date.now(),

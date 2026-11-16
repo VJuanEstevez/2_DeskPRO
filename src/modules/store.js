@@ -75,15 +75,36 @@ function emit(key, value) {
   }
 }
 
+const TOAST_DURATION = 3000;
+const TOAST_FADE = 240;
+
+let showTimer = null;
+let hideTimer = null;
+
 /**
- * Simple transient notifications for the live region.
+ * Simple transient notifications for the live region: they fade in, stay for a
+ * few seconds and then hide themselves instead of lingering on screen.
  * @param {string} message
  */
 export function announce(message) {
   const region = document.getElementById('toast-region');
   if (!region) return;
+
+  window.clearTimeout(showTimer);
+  window.clearTimeout(hideTimer);
+  region.classList.remove('is-leaving');
   region.textContent = '';
-  window.setTimeout(() => {
+
+  showTimer = window.setTimeout(() => {
     region.textContent = message;
+
+    hideTimer = window.setTimeout(() => {
+      region.classList.add('is-leaving');
+
+      hideTimer = window.setTimeout(() => {
+        region.classList.remove('is-leaving');
+        region.textContent = '';
+      }, TOAST_FADE);
+    }, TOAST_DURATION);
   }, 40);
 }

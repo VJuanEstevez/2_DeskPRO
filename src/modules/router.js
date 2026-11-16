@@ -8,6 +8,9 @@ import notebook from './apps/notebook.js';
 import player from './apps/player.js';
 import favorites from './apps/favorites.js';
 import password from './apps/password.js';
+import typography from './apps/typography.js';
+import color from './apps/color.js';
+import textgen from './apps/textgen.js';
 
 const VIEWS = {
   '': dashboard,
@@ -19,6 +22,9 @@ const VIEWS = {
   player,
   favorites,
   password,
+  typography,
+  color,
+  textgen,
 };
 
 const HOME_TITLE = 'Dashboard';

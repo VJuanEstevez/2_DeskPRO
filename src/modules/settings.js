@@ -1,13 +1,18 @@
-import { read, write, subscribe } from './store.js';
+import { read, write, subscribe, announce } from './store.js';
 import { APPS } from './registry.js';
 import { MAJOR_CITIES } from './data/cities.js';
 
 export const SETTINGS_KEY = 'settings';
 
+// The panel slider offers 2 × 2, 3 × 3 and 4 × 4 layouts only.
+export const MIN_GRID_COLUMNS = 2;
+export const MAX_GRID_COLUMNS = 4;
+
 export const DEFAULT_SETTINGS = {
   name: '',
   theme: 'system',
   defaultCity: 'Madrid',
+  gridColumns: 3,
   hiddenApps: [],
   appOrder: [],
 };
@@ -15,11 +20,20 @@ export const DEFAULT_SETTINGS = {
 let systemThemeListenerBound = false;
 
 /**
- * @returns {{name: string, theme: string, defaultCity: string, hiddenApps: string[], appOrder: string[]}}
+ * @returns {{name: string, theme: string, defaultCity: string, gridColumns: number, hiddenApps: string[], appOrder: string[]}}
  */
 export function getSettings() {
   const stored = read(SETTINGS_KEY, {});
-  return { ...DEFAULT_SETTINGS, ...(stored && typeof stored === 'object' ? stored : {}) };
+  const source = stored && typeof stored === 'object' ? stored : {};
+  const columns = Math.round(Number(source.gridColumns));
+
+  return {
+    ...DEFAULT_SETTINGS,
+    ...source,
+    gridColumns: Number.isFinite(columns)
+      ? Math.min(MAX_GRID_COLUMNS, Math.max(MIN_GRID_COLUMNS, columns))
+      : DEFAULT_SETTINGS.gridColumns,
+  };
 }
 
 /**
@@ -85,8 +99,39 @@ export function mountSettings() {
   const toggle = document.getElementById('settings-toggle');
   const appsList = document.getElementById('settings-apps');
   const cityDatalist = document.getElementById('city-options');
+  const columnsInput = document.getElementById('setting-columns');
+  const columnsOutput = document.getElementById('setting-columns-value');
 
   if (!dialog || !form || !toggle || !appsList || !cityDatalist) return;
+
+  /**
+   * @param {unknown} value
+   * @returns {number}
+   */
+  const clampColumns = (value) => {
+    const columns = Math.round(Number(value));
+    return Number.isFinite(columns)
+      ? Math.min(MAX_GRID_COLUMNS, Math.max(MIN_GRID_COLUMNS, columns))
+      : getSettings().gridColumns;
+  };
+
+  /** Previews the column count on the dashboard without persisting it. */
+  const previewColumns = (value) => {
+    const grid = document.querySelector('.dashboard__grid');
+    if (grid) grid.style.setProperty('--dashboard-columns', String(value));
+  };
+
+  /** Syncs the slider, its output and the dashboard preview with the stored value. */
+  const paintColumns = () => {
+    const columns = getSettings().gridColumns;
+    if (columnsInput) {
+      columnsInput.min = String(MIN_GRID_COLUMNS);
+      columnsInput.max = String(MAX_GRID_COLUMNS);
+      columnsInput.value = String(columns);
+    }
+    if (columnsOutput) columnsOutput.textContent = `${columns} × ${columns}`;
+    previewColumns(columns);
+  };
 
   cityDatalist.innerHTML = MAJOR_CITIES.map((city) => `<option value="${escapeHtml(city.name)}"></option>`).join('');
 
@@ -109,13 +154,21 @@ export function mountSettings() {
   document.getElementById('settings-cancel').addEventListener('click', closeDialog);
 
   dialog.addEventListener('close', () => {
-    if (dialog.returnValue !== 'save') return;
+    if (dialog.returnValue !== 'save') {
+      paintColumns(); // Cancelling reverts the live preview.
+      return;
+    }
+
     const data = new FormData(form);
     const theme = String(data.get('theme') || 'system');
     const name = String(data.get('name') || '').trim();
     const defaultCity = String(data.get('city') || '').trim() || DEFAULT_SETTINGS.defaultCity;
+    const previousColumns = getSettings().gridColumns;
+    const gridColumns = columnsInput ? clampColumns(columnsInput.value) : previousColumns;
 
-    saveSettings({ name, theme, defaultCity });
+    saveSettings({ name, theme, defaultCity, gridColumns });
+    paintColumns();
+    if (gridColumns !== previousColumns) announce(`Panel en ${gridColumns} × ${gridColumns}`);
     renderAppRows();
   });
 
@@ -124,7 +177,16 @@ export function mountSettings() {
     form.elements.namedItem('name').value = settings.name;
     form.elements.namedItem('theme').value = settings.theme;
     form.elements.namedItem('city').value = settings.defaultCity;
+    paintColumns();
   };
+
+  if (columnsInput) {
+    columnsInput.addEventListener('input', () => {
+      const value = clampColumns(columnsInput.value);
+      if (columnsOutput) columnsOutput.textContent = `${value} × ${value}`;
+      previewColumns(value);
+    });
+  }
 
   const renderAppRows = () => {
     const settings = getSettings();

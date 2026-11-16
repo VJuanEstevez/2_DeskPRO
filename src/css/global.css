@@ -570,10 +570,13 @@ select.field__control {
   max-width: 22rem;
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--on-accent);
-  background: var(--accent);
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--success);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow);
+  transition: opacity var(--transition), transform var(--transition);
 
   &:empty {
     display: none;
@@ -581,6 +584,19 @@ select.field__control {
 
   &:not(:empty) {
     padding: var(--space-3) var(--space-4);
+    animation: toast-in var(--transition);
+  }
+
+  &.is-leaving {
+    opacity: 0;
+    transform: translateY(0.25rem);
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.25rem);
   }
 }
 
