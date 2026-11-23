@@ -1,21 +1,21 @@
-const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast';
+const FORECAST_URL = "https://api.open-meteo.com/v1/forecast";
 const CACHE_TTL = 10 * 60 * 1000;
 
 const forecastCache = new Map();
 const currentCache = new Map();
 
 const WMO_CODES = [
-  { max: 0, label: 'Despejado', icon: 'wmo-clear' },
-  { max: 1, label: 'Mayormente despejado', icon: 'wmo-partly' },
-  { max: 2, label: 'Parcialmente nublado', icon: 'wmo-partly' },
-  { max: 3, label: 'Nublado', icon: 'wmo-cloud' },
-  { max: 48, label: 'Niebla', icon: 'wmo-fog' },
-  { max: 57, label: 'Llovizna', icon: 'wmo-rain' },
-  { max: 67, label: 'Lluvia', icon: 'wmo-rain' },
-  { max: 77, label: 'Nieve', icon: 'wmo-snow' },
-  { max: 82, label: 'Chubascos', icon: 'wmo-rain' },
-  { max: 86, label: 'Nieve', icon: 'wmo-snow' },
-  { max: 99, label: 'Tormenta', icon: 'wmo-storm' },
+  { max: 0, label: "Despejado", icon: "wmo-clear" },
+  { max: 1, label: "Mayormente despejado", icon: "wmo-partly" },
+  { max: 2, label: "Parcialmente nublado", icon: "wmo-partly" },
+  { max: 3, label: "Nublado", icon: "wmo-cloud" },
+  { max: 48, label: "Niebla", icon: "wmo-fog" },
+  { max: 57, label: "Llovizna", icon: "wmo-rain" },
+  { max: 67, label: "Lluvia", icon: "wmo-rain" },
+  { max: 77, label: "Nieve", icon: "wmo-snow" },
+  { max: 82, label: "Chubascos", icon: "wmo-rain" },
+  { max: 86, label: "Nieve", icon: "wmo-snow" },
+  { max: 99, label: "Tormenta", icon: "wmo-storm" },
 ];
 
 /**
@@ -42,11 +42,13 @@ export function fetchForecast(latitude, longitude) {
   const params = new URLSearchParams({
     latitude: String(latitude),
     longitude: String(longitude),
-    current: 'temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code,wind_speed_10m,precipitation',
-    hourly: 'temperature_2m,precipitation_probability,weather_code,wind_speed_10m',
-    daily: 'weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,wind_speed_10m_max',
-    timezone: 'auto',
-    forecast_days: '7',
+    current:
+      "temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code,wind_speed_10m,precipitation",
+    hourly: "temperature_2m,precipitation_probability,weather_code,wind_speed_10m",
+    daily:
+      "weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,wind_speed_10m_max",
+    timezone: "auto",
+    forecast_days: "7",
   });
 
   return fetch(`${FORECAST_URL}?${params}`)
@@ -66,15 +68,15 @@ export function fetchForecast(latitude, longitude) {
  * @returns {Promise<Array<{name: string, temperature: number, weatherCode: number, isDay: boolean}>>}
  */
 export function fetchCurrentBatch(cities) {
-  const key = cities.map((city) => city.name).join('|');
+  const key = cities.map((city) => city.name).join("|");
   const cached = currentCache.get(key);
   if (cached && Date.now() - cached.at < CACHE_TTL) return Promise.resolve(cached.data);
 
   const params = new URLSearchParams({
-    latitude: cities.map((city) => city.latitude).join(','),
-    longitude: cities.map((city) => city.longitude).join(','),
-    current: 'temperature_2m,weather_code,is_day',
-    timezone: 'auto',
+    latitude: cities.map((city) => city.latitude).join(","),
+    longitude: cities.map((city) => city.longitude).join(","),
+    current: "temperature_2m,weather_code,is_day",
+    timezone: "auto",
   });
 
   return fetch(`${FORECAST_URL}?${params}`)
@@ -115,7 +117,7 @@ export function fetchCurrent(latitude, longitude) {
       precipitation: current.precipitation ?? null,
       weatherCode: current.weather_code ?? 0,
       isDay: current.is_day === 1,
-      time: current.time || '',
+      time: current.time || "",
     };
   });
 }
@@ -126,7 +128,7 @@ export function fetchCurrent(latitude, longitude) {
  */
 export function next24Hours(forecast) {
   const times = forecast.hourly.time;
-  const reference = String(forecast.current.time || '').slice(0, 13);
+  const reference = String(forecast.current.time || "").slice(0, 13);
   let index = times.findIndex((time) => time.slice(0, 13) >= reference);
   if (index < 0) index = 0;
 

@@ -68,7 +68,9 @@
   border: 1px solid transparent;
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background var(--transition), border-color var(--transition);
+  transition:
+    background var(--transition),
+    border-color var(--transition);
 
   &:hover {
     background: var(--surface-2);
@@ -159,13 +161,13 @@
   overflow-wrap: anywhere;
 }
 
-@media (max-width: 60rem) {
+@media (width <= 60rem) {
   .calendar__layout {
     grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 47.99rem) {
+@media (width <= 47.99rem) {
   .event-form__row {
     grid-template-columns: 1fr;
   }

@@ -4,28 +4,24 @@
    ========================================================================== */
 
 :root,
-[data-theme='dark'] {
+[data-theme="dark"] {
   color-scheme: dark;
 
-  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
-
+  --font-sans: system-ui, -apple-system, "Segoe UI", roboto, helvetica, arial, sans-serif;
+  --font-mono: ui-monospace, sfmono-regular, menlo, consolas, "Liberation Mono", monospace;
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
   --space-4: 1rem;
   --space-5: 1.5rem;
   --space-6: 2rem;
-
   --radius-sm: 0.375rem;
   --radius-md: 0.625rem;
   --radius-lg: 1rem;
   --radius-full: 999px;
-
   --header-height: 5.5rem;
   --nav-width: 4.5rem;
   --content-max: 80rem;
-
   --bg: #0a0e14;
   --surface: #111823;
   --surface-2: #18212e;
@@ -39,17 +35,16 @@
   --success: #56d98a;
   --warning: #f5c451;
   --danger: #ff8080;
-
   --shadow: 0 12px 32px rgb(0 0 0 / 40%);
   --shadow-hover: 0 24px 64px -8px rgb(0 0 0 / 75%);
   --transition: 160ms ease;
 }
 
-[data-theme='light'] {
+[data-theme="light"] {
   color-scheme: light;
 
   --bg: #f4f6fa;
-  --surface: #ffffff;
+  --surface: #fff;
   --surface-2: #eef1f6;
   --border: #dde3ec;
   --border-strong: #78848f;
@@ -57,11 +52,10 @@
   --text-muted: #4f5a67;
   --accent: #0b62c9;
   --accent-strong: #0a52a8;
-  --on-accent: #ffffff;
+  --on-accent: #fff;
   --success: #106b3a;
   --warning: #8a5a00;
   --danger: #b3261e;
-
   --shadow: 0 12px 30px rgb(16 21 27 / 8%);
   --shadow-hover: 0 24px 60px -10px rgb(16 21 27 / 26%);
 }
@@ -74,7 +68,7 @@
 
 html {
   font-size: 100%;
-  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -85,7 +79,8 @@ body {
   line-height: 1.55;
   color: var(--text);
   background-color: var(--bg);
-  background-image: radial-gradient(circle at 12% -10%, rgb(94 176 255 / 12%), transparent 45%),
+  background-image:
+    radial-gradient(circle at 12% -10%, rgb(94 176 255 / 12%), transparent 45%),
     radial-gradient(circle at 92% 4%, rgb(124 92 255 / 10%), transparent 40%);
   background-attachment: fixed;
   padding-top: var(--header-height);
@@ -180,7 +175,7 @@ textarea {
   height: 1.25rem;
   flex: none;
   fill: none;
-  stroke: currentColor;
+  stroke: currentcolor;
   stroke-width: 1.75;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -272,12 +267,12 @@ textarea {
   }
 }
 
-input[type='search']::-webkit-search-cancel-button,
-input[type='search']::-webkit-search-decoration {
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
   appearance: none;
 }
 
-input[type='range'] {
+input[type="range"] {
   width: 100%;
   accent-color: var(--accent);
   cursor: pointer;
@@ -340,7 +335,9 @@ select.field__control {
   border: 0;
   border-radius: var(--radius-full);
   cursor: pointer;
-  transition: color var(--transition), background var(--transition);
+  transition:
+    color var(--transition),
+    background var(--transition);
 
   &:hover {
     color: var(--text);
@@ -401,7 +398,9 @@ select.field__control {
   background: var(--surface);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
-  transition: background var(--transition), border-color var(--transition);
+  transition:
+    background var(--transition),
+    border-color var(--transition);
 }
 
 .check__input:checked + .check__box {
@@ -432,7 +431,10 @@ select.field__control {
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background var(--transition), border-color var(--transition), transform var(--transition);
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    transform var(--transition);
 
   &:hover {
     border-color: var(--accent);
@@ -474,14 +476,17 @@ select.field__control {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background var(--transition), border-color var(--transition), color var(--transition);
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition);
 
   &:hover {
     border-color: var(--accent);
     color: var(--accent);
   }
 
-  &[data-armed='true'] {
+  &[data-armed="true"] {
     color: #fff;
     background: var(--danger);
     border-color: var(--danger);
@@ -524,7 +529,9 @@ select.field__control {
   color: var(--text-muted);
   border-radius: var(--radius-full);
   cursor: pointer;
-  transition: background var(--transition), color var(--transition);
+  transition:
+    background var(--transition),
+    color var(--transition);
 
   &:hover {
     color: var(--text);
@@ -655,7 +662,9 @@ select.field__control {
   border-left: 3px solid var(--success);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow);
-  transition: opacity var(--transition), transform var(--transition);
+  transition:
+    opacity var(--transition),
+    transform var(--transition);
 
   &:empty {
     display: none;
@@ -683,6 +692,7 @@ select.field__control {
   from {
     background-position: 200% 0;
   }
+
   to {
     background-position: -200% 0;
   }

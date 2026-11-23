@@ -11,16 +11,16 @@ export function loadYouTubeApi() {
   apiPromise = new Promise((resolve, reject) => {
     const previousCallback = window.onYouTubeIframeAPIReady;
     window.onYouTubeIframeAPIReady = () => {
-      if (typeof previousCallback === 'function') previousCallback();
+      if (typeof previousCallback === "function") previousCallback();
       resolve(window.YT);
     };
 
-    const script = document.createElement('script');
-    script.src = 'https://www.youtube.com/iframe_api';
+    const script = document.createElement("script");
+    script.src = "https://www.youtube.com/iframe_api";
     script.async = true;
     script.onerror = () => {
       apiPromise = null;
-      reject(new Error('No se pudo cargar la API de YouTube'));
+      reject(new Error("No se pudo cargar la API de YouTube"));
     };
     document.head.appendChild(script);
 
@@ -28,7 +28,7 @@ export function loadYouTubeApi() {
       if (window.YT && window.YT.Player) resolve(window.YT);
       else {
         apiPromise = null;
-        reject(new Error('La API de YouTube tardó demasiado en responder'));
+        reject(new Error("La API de YouTube tardó demasiado en responder"));
       }
     }, 15000);
   });
@@ -42,25 +42,27 @@ export function loadYouTubeApi() {
  * @returns {string|null}
  */
 export function parseVideoId(input) {
-  const value = String(input || '').trim();
+  const value = String(input || "").trim();
   if (!value) return null;
 
   if (/^[a-zA-Z0-9_-]{11}$/.test(value)) return value;
 
   let url;
   try {
-    url = new URL(value.startsWith('http') ? value : `https://${value}`);
-  } catch (error) {
+    url = new URL(value.startsWith("http") ? value : `https://${value}`);
+  } catch {
     return null;
   }
 
-  const host = url.hostname.replace(/^www\./, '');
-  if (host === 'youtu.be') return normalizeId(url.pathname.slice(1));
-  if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com') {
-    const fromQuery = url.searchParams.get('v');
+  const host = url.hostname.replace(/^www\./, "");
+  if (host === "youtu.be") return normalizeId(url.pathname.slice(1));
+  if (host === "youtube.com" || host === "m.youtube.com" || host === "music.youtube.com") {
+    const fromQuery = url.searchParams.get("v");
     if (fromQuery) return normalizeId(fromQuery);
-    const segments = url.pathname.split('/').filter(Boolean);
-    const marker = segments.findIndex((segment) => ['embed', 'shorts', 'live', 'v'].includes(segment));
+    const segments = url.pathname.split("/").filter(Boolean);
+    const marker = segments.findIndex((segment) =>
+      ["embed", "shorts", "live", "v"].includes(segment)
+    );
     if (marker >= 0 && segments[marker + 1]) return normalizeId(segments[marker + 1]);
   }
 
@@ -79,7 +81,7 @@ export function fetchVideoTitle(videoId) {
 
   return fetch(endpoint)
     .then((response) => (response.ok ? response.json() : null))
-    .then((data) => (data && typeof data.title === 'string' ? data.title : null))
+    .then((data) => (data && typeof data.title === "string" ? data.title : null))
     .catch(() => null);
 }
 

@@ -1,7 +1,7 @@
-import { getSettings } from './settings.js';
+import { getSettings } from "./settings.js";
 
-const REVERSE_URL = 'https://nominatim.openstreetmap.org/reverse';
-const GEOCODE_URL = 'https://geocoding-api.open-meteo.com/v1/search';
+const REVERSE_URL = "https://nominatim.openstreetmap.org/reverse";
+const GEOCODE_URL = "https://geocoding-api.open-meteo.com/v1/search";
 
 let locationPromise = null;
 const geocodeCache = new Map();
@@ -21,7 +21,7 @@ export function getLocation() {
       resolveCity(city).then(resolve);
     };
 
-    if (!('geolocation' in navigator)) {
+    if (!("geolocation" in navigator)) {
       fallbackToCity();
       return;
     }
@@ -30,8 +30,15 @@ export function getLocation() {
       (position) => {
         const { latitude, longitude } = position.coords;
         reverseGeocode(latitude, longitude)
-          .then((name) => resolve({ name, latitude, longitude, source: 'gps' }))
-          .catch(() => resolve({ name: `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`, latitude, longitude, source: 'gps' }));
+          .then((name) => resolve({ name, latitude, longitude, source: "gps" }))
+          .catch(() =>
+            resolve({
+              name: `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`,
+              latitude,
+              longitude,
+              source: "gps",
+            })
+          );
       },
       fallbackToCity,
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 }
@@ -62,7 +69,7 @@ export function setLocationFromCity(city) {
  * @returns {Promise<{name: string, latitude: number, longitude: number, source: 'city'}>}
  */
 export function resolveCity(city) {
-  const query = String(city || '').trim();
+  const query = String(city || "").trim();
   const cacheKey = query.toLowerCase();
 
   if (geocodeCache.has(cacheKey)) return Promise.resolve(geocodeCache.get(cacheKey));
@@ -74,19 +81,19 @@ export function resolveCity(city) {
     })
     .then((data) => {
       const place = data.results && data.results[0];
-      if (!place) throw new Error('Place not found');
+      if (!place) throw new Error("Place not found");
 
       const resolved = {
         name: place.name || query,
         latitude: place.latitude,
         longitude: place.longitude,
-        source: 'city',
+        source: "city",
       };
       geocodeCache.set(cacheKey, resolved);
       return resolved;
     })
     .catch(() => {
-      const fallback = { name: query, latitude: null, longitude: null, source: 'city' };
+      const fallback = { name: query, latitude: null, longitude: null, source: "city" };
       geocodeCache.set(cacheKey, fallback);
       return fallback;
     });
@@ -119,9 +126,11 @@ export function reverseGeocode(latitude, longitude) {
         address.county ||
         address.state ||
         (data && data.name) ||
-        '';
-      const country = address.country || '';
-      const label = [name, country].filter(Boolean).join(', ') || `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`;
+        "";
+      const country = address.country || "";
+      const label =
+        [name, country].filter(Boolean).join(", ") ||
+        `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`;
       reverseCache.set(cacheKey, label);
       return label;
     })

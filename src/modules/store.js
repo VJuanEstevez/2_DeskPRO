@@ -1,4 +1,4 @@
-const NAMESPACE = 'deskpro:v1:';
+const NAMESPACE = "deskpro:v1:";
 const listeners = new Map();
 
 /**
@@ -11,7 +11,7 @@ export function read(key, fallback = null) {
     const raw = window.localStorage.getItem(NAMESPACE + key);
     if (raw === null) return fallback;
     return JSON.parse(raw);
-  } catch (error) {
+  } catch {
     return fallback;
   }
 }
@@ -24,7 +24,7 @@ export function read(key, fallback = null) {
 export function write(key, value) {
   try {
     window.localStorage.setItem(NAMESPACE + key, JSON.stringify(value));
-  } catch (error) {
+  } catch {
     // Storage full or unavailable (private mode): state stays in memory for this session.
   }
   emit(key, value);
@@ -66,11 +66,11 @@ export function subscribe(key, listener) {
 function emit(key, value) {
   const bucket = listeners.get(key);
   if (!bucket) return;
-  for (const listener of [...bucket]) {
+  for (const listener of Array.from(bucket)) {
     try {
       listener(value);
     } catch (error) {
-      console.error('DeskPRO store listener failed', error);
+      console.error("DeskPRO store listener failed", error);
     }
   }
 }
@@ -87,23 +87,23 @@ let hideTimer = null;
  * @param {string} message
  */
 export function announce(message) {
-  const region = document.getElementById('toast-region');
+  const region = document.getElementById("toast-region");
   if (!region) return;
 
   window.clearTimeout(showTimer);
   window.clearTimeout(hideTimer);
-  region.classList.remove('is-leaving');
-  region.textContent = '';
+  region.classList.remove("is-leaving");
+  region.textContent = "";
 
   showTimer = window.setTimeout(() => {
     region.textContent = message;
 
     hideTimer = window.setTimeout(() => {
-      region.classList.add('is-leaving');
+      region.classList.add("is-leaving");
 
       hideTimer = window.setTimeout(() => {
-        region.classList.remove('is-leaving');
-        region.textContent = '';
+        region.classList.remove("is-leaving");
+        region.textContent = "";
       }, TOAST_FADE);
     }, TOAST_DURATION);
   }, 40);

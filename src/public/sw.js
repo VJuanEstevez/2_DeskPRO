@@ -1,23 +1,23 @@
 /* DeskPRO service worker — App Shell + offline runtime caches. */
 
-const VERSION = 'v1';
-const CACHE_PREFIX = 'deskpro-';
+const VERSION = "v1";
+const CACHE_PREFIX = "deskpro-";
 const CACHE_NAME = `${CACHE_PREFIX}${VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_PREFIX}${VERSION}-runtime`;
 const EXTERNAL_CACHE = `${CACHE_PREFIX}${VERSION}-external`;
 
 const SCOPE = self.registration.scope;
-const SHELL_URL = new URL('./index.html', SCOPE);
-const ROOT_URL = new URL('./', SCOPE);
+const SHELL_URL = new URL("./index.html", SCOPE);
+const ROOT_URL = new URL("./", SCOPE);
 
 const SHELL_EXTRAS = [
   SHELL_URL,
   ROOT_URL,
-  new URL('./manifest.webmanifest', SCOPE),
-  new URL('./icons/icon-192.png', SCOPE),
-  new URL('./icons/icon-512.png', SCOPE),
-  new URL('./icons/icon-512-maskable.png', SCOPE),
-  new URL('./icons/apple-touch-icon.png', SCOPE),
+  new URL("./manifest.webmanifest", SCOPE),
+  new URL("./icons/icon-192.png", SCOPE),
+  new URL("./icons/icon-512.png", SCOPE),
+  new URL("./icons/icon-512-maskable.png", SCOPE),
+  new URL("./icons/apple-touch-icon.png", SCOPE),
 ];
 
 /**
@@ -26,27 +26,35 @@ const SHELL_EXTRAS = [
  */
 async function precacheShell() {
   const cache = await caches.open(CACHE_NAME);
-  const response = await fetch(SHELL_URL, { cache: 'reload' });
+  const response = await fetch(SHELL_URL, { cache: "reload" });
   if (!response.ok) throw new Error(`No se pudo precargar el App Shell: ${response.status}`);
 
   const html = await response.text();
-  const shellResponse = new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+  const shellResponse = new Response(html, {
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+  });
 
   await cache.put(SHELL_URL, shellResponse.clone());
   await cache.put(ROOT_URL, shellResponse.clone());
 
-  const urls = new Set([...SHELL_EXTRAS.map((url) => url.href)]);
+  const urls = new Set(SHELL_EXTRAS.map((url) => url.href));
   const references = /(?:src|href)=["']([^"']+)["']/g;
   let match;
 
   while ((match = references.exec(html)) !== null) {
     const value = match[1].trim();
-    if (!value || value.startsWith('#') || value.startsWith('data:') || /^[a-z][a-z0-9+.-]*:/i.test(value)) continue;
+    if (
+      !value ||
+      value.startsWith("#") ||
+      value.startsWith("data:") ||
+      /^[a-z][a-z0-9+.-]*:/i.test(value)
+    )
+      continue;
 
     try {
       const url = new URL(value, SHELL_URL);
       if (url.origin === self.location.origin) urls.add(url.href);
-    } catch (error) {
+    } catch {
       // Ignore malformed references; they are not part of the App Shell.
     }
   }
@@ -55,14 +63,14 @@ async function precacheShell() {
     [...urls].map(async (href) => {
       try {
         if (!(await cache.match(href))) await cache.add(href);
-      } catch (error) {
+      } catch {
         // One missing optional asset must not block installation.
       }
     })
   );
 }
 
-self.addEventListener('install', (event) => {
+self.addEventListener("install", (event) => {
   event.waitUntil(
     (async () => {
       await precacheShell();
@@ -71,14 +79,16 @@ self.addEventListener('install', (event) => {
   );
 });
 
-self.addEventListener('activate', (event) => {
+self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
       const keys = await caches.keys();
       await Promise.all(
-        keys.filter((key) => key.startsWith(CACHE_PREFIX) && !key.startsWith(`${CACHE_PREFIX}${VERSION}-`)).map(
-          (key) => caches.delete(key)
-        )
+        keys
+          .filter(
+            (key) => key.startsWith(CACHE_PREFIX) && !key.startsWith(`${CACHE_PREFIX}${VERSION}-`)
+          )
+          .map((key) => caches.delete(key))
       );
       await self.clients.claim();
     })()
@@ -97,13 +107,13 @@ async function networkFirst(request) {
       ]);
     }
     return response;
-  } catch (error) {
+  } catch {
     const cached = (await cache.match(request)) || (await cache.match(SHELL_URL));
     if (cached) return cached;
 
     return new Response(
       '<!doctype html><html lang="es"><meta charset="utf-8"><title>Sin conexión</title><p>Inicia DeskPRO al menos una vez con conexión para usarla offline.</p></html>',
-      { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+      { status: 503, headers: { "Content-Type": "text/html; charset=utf-8" } }
     );
   }
 }
@@ -117,7 +127,7 @@ async function cacheFirst(request) {
     const cache = await caches.open(RUNTIME_CACHE);
     try {
       await cache.put(request, response.clone());
-    } catch (error) {
+    } catch {
       // Non-cacheable responses still work for this request.
     }
   }
@@ -130,7 +140,7 @@ async function staleWhileRevalidate(request) {
 
   const update = fetch(request)
     .then((response) => {
-      if (response && (response.ok || response.type === 'opaque')) {
+      if (response && (response.ok || response.type === "opaque")) {
         cache.put(request, response.clone()).catch(() => {});
       }
       return response;
@@ -145,24 +155,24 @@ async function staleWhileRevalidate(request) {
   throw new Error(`Recurso externo no disponible sin conexión: ${request.url}`);
 }
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
   const request = event.request;
-  if (request.method !== 'GET') return;
+  if (request.method !== "GET") return;
 
   let url;
   try {
     url = new URL(request.url);
-  } catch (error) {
+  } catch {
     return;
   }
-  if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
+  if (url.protocol !== "http:" && url.protocol !== "https:") return;
 
   if (url.origin !== self.location.origin) {
     event.respondWith(staleWhileRevalidate(request));
     return;
   }
 
-  if (request.mode === 'navigate') {
+  if (request.mode === "navigate") {
     event.respondWith(networkFirst(request));
     return;
   }

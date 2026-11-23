@@ -1,7 +1,7 @@
-import { selectApps, getSettings } from './settings.js';
-import { subscribe } from './store.js';
-import { WIDGETS } from './widgets.js';
-import { icon, escapeHtml } from './ui.js';
+import { selectApps, getSettings } from "./settings.js";
+import { subscribe } from "./store.js";
+import { WIDGETS } from "./widgets.js";
+import { icon, escapeHtml } from "./ui.js";
 
 /**
  * Dashboard view: a grid of application cards with live mini widgets.
@@ -9,7 +9,7 @@ import { icon, escapeHtml } from './ui.js';
  * column layout in sync with the value saved from the settings dialog.
  */
 export default {
-  meta: { title: 'Panel' },
+  meta: { title: "Panel" },
   render(root) {
     let widgetCleanups = [];
     let appsSignature = null;
@@ -19,14 +19,14 @@ export default {
       widgetCleanups = [];
     };
 
-    const signatureFor = (apps) => apps.map((app) => app.id).join('|');
+    const signatureFor = (apps) => apps.map((app) => app.id).join("|");
 
     const paintColumns = () => {
-      const grid = root.querySelector('.dashboard__grid');
+      const grid = root.querySelector(".dashboard__grid");
       if (!grid) return;
 
       const columns = getSettings().gridColumns;
-      grid.style.setProperty('--dashboard-columns', String(columns));
+      grid.style.setProperty("--dashboard-columns", String(columns));
     };
 
     const paint = () => {
@@ -38,17 +38,17 @@ export default {
         root.innerHTML = `
           <section class="app app--dashboard">
             <div class="empty-state">
-              ${icon('icon-grid', { size: 30, className: 'empty-state__icon' })}
+              ${icon("icon-grid", { size: 30, className: "empty-state__icon" })}
               <p class="empty-state__title">No hay aplicaciones visibles</p>
               <p class="empty-state__text">Activa al menos una desde el botón de ajustes.</p>
               <button class="button button--primary" type="button" id="dashboard-open-settings">
-                ${icon('icon-settings')}<span>Abrir ajustes</span>
+                ${icon("icon-settings")}<span>Abrir ajustes</span>
               </button>
             </div>
           </section>`;
 
-        root.querySelector('#dashboard-open-settings').addEventListener('click', () => {
-          document.getElementById('settings-toggle').click();
+        root.querySelector("#dashboard-open-settings").addEventListener("click", () => {
+          document.getElementById("settings-toggle").click();
         });
         return;
       }
@@ -68,26 +68,26 @@ export default {
                 </div>
               </article>`
               )
-              .join('')}
+              .join("")}
           </div>
         </section>`;
 
       paintColumns();
 
-      widgetCleanups = [...root.querySelectorAll('[data-widget]')]
+      widgetCleanups = [...root.querySelectorAll("[data-widget]")]
         .map((node) => {
           const factory = WIDGETS[node.dataset.widget];
           if (!factory) {
-            node.textContent = '';
+            node.textContent = "";
             return null;
           }
           return factory(node);
         })
-        .filter((cleanup) => typeof cleanup === 'function');
+        .filter((cleanup) => typeof cleanup === "function");
     };
 
     paint();
-    const unsubscribe = subscribe('settings', () => {
+    const unsubscribe = subscribe("settings", () => {
       const apps = selectApps();
       if (signatureFor(apps) !== appsSignature) paint();
       else paintColumns();

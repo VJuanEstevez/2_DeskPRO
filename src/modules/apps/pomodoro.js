@@ -1,15 +1,15 @@
-import '../../css/apps/pomodoro.css';
+import "../../css/apps/pomodoro.css";
 
-import { read, write, subscribe, announce } from '../store.js';
-import { icon, formatClock, escapeHtml } from '../ui.js';
+import { read, write, subscribe, announce } from "../store.js";
+import { icon, formatClock, escapeHtml } from "../ui.js";
 
-const STORAGE_KEY = 'pomodoro';
-const BASE_TITLE = 'DeskPRO · Dashboard de productividad';
+const STORAGE_KEY = "pomodoro";
+const BASE_TITLE = "DeskPRO · Dashboard de productividad";
 
 export const PHASES = [
-  { id: 'focus', label: 'Foco', minutes: 25, next: 'short' },
-  { id: 'short', label: 'Descanso corto', minutes: 5, next: 'focus' },
-  { id: 'long', label: 'Descanso largo', minutes: 15, next: 'focus' },
+  { id: "focus", label: "Foco", minutes: 25, next: "short" },
+  { id: "short", label: "Descanso corto", minutes: 5, next: "focus" },
+  { id: "long", label: "Descanso largo", minutes: 15, next: "focus" },
 ];
 
 const RADIUS = 54;
@@ -22,7 +22,7 @@ let alarmContext = null;
 const alarmOscillators = new Set();
 
 const state = {
-  phase: 'focus',
+  phase: "focus",
   remaining: PHASES[0].minutes * 60,
   running: false,
   endsAt: 0,
@@ -46,11 +46,11 @@ function notify(force = false) {
   if (!force && state.lastNotifiedSecond === second) return;
   state.lastNotifiedSecond = second;
   syncTitle();
-  for (const listener of [...listeners]) {
+  for (const listener of Array.from(listeners)) {
     try {
       listener({ ...state });
     } catch (error) {
-      console.error('DeskPRO pomodoro listener failed', error);
+      console.error("DeskPRO pomodoro listener failed", error);
     }
   }
 }
@@ -90,7 +90,7 @@ function tick() {
  */
 function completePhase(countAsCompleted = true) {
   const phase = phaseById(state.phase);
-  const wasFocus = phase.id === 'focus';
+  const wasFocus = phase.id === "focus";
 
   if (wasFocus && countAsCompleted) state.completed += 1;
   persist();
@@ -106,7 +106,7 @@ function completePhase(countAsCompleted = true) {
 
   const nextLabel = phaseById(state.phase).label;
   const message = countAsCompleted
-    ? `${wasFocus ? 'Foco completado' : 'Descanso terminado'}. Sigue: ${nextLabel}`
+    ? `${wasFocus ? "Foco completado" : "Descanso terminado"}. Sigue: ${nextLabel}`
     : `Fase saltada. Sigue: ${nextLabel}`;
   announce(message);
   document.title = BASE_TITLE;
@@ -130,7 +130,7 @@ function stopInterval() {
 function beep(context, start) {
   const oscillator = context.createOscillator();
   const gain = context.createGain();
-  oscillator.type = 'sine';
+  oscillator.type = "sine";
   oscillator.frequency.value = 880;
   gain.gain.setValueAtTime(0.0001, start);
   gain.gain.exponentialRampToValueAtTime(0.2, start + 0.02);
@@ -145,9 +145,9 @@ function beep(context, start) {
 
 function alarmPulse() {
   if (!state.alarm || !alarmContext) return;
-  if (alarmContext.state === 'suspended') {
+  if (alarmContext.state === "suspended") {
     const resumed = alarmContext.resume();
-    if (resumed && typeof resumed.catch === 'function') resumed.catch(() => {});
+    if (resumed && typeof resumed.catch === "function") resumed.catch(() => {});
   }
   const start = alarmContext.currentTime;
   beep(alarmContext, start);
@@ -164,7 +164,7 @@ export function startAlarm() {
   if (Context) {
     try {
       alarmContext = alarmContext || new Context();
-    } catch (error) {
+    } catch {
       alarmContext = null;
     }
   }
@@ -190,15 +190,15 @@ export function stopAlarm() {
   for (const oscillator of alarmOscillators) {
     try {
       oscillator.stop();
-    } catch (error) {
+    } catch {
       // The oscillator already ended: nothing left to stop.
     }
   }
   alarmOscillators.clear();
 
-  if (alarmContext && alarmContext.state !== 'closed') {
+  if (alarmContext && alarmContext.state !== "closed") {
     const closing = alarmContext.close();
-    if (closing && typeof closing.catch === 'function') closing.catch(() => {});
+    if (closing && typeof closing.catch === "function") closing.catch(() => {});
   }
   alarmContext = null;
   notify(true);
@@ -278,7 +278,7 @@ function isoDuration(value) {
 }
 
 function render() {
-  const root = document.getElementById('pomodoro-app');
+  const root = document.getElementById("pomodoro-app");
   if (!root) return;
 
   const phase = phaseById(state.phase);
@@ -286,27 +286,27 @@ function render() {
   const progress = total > 0 ? state.remaining / total : 0;
   const offset = CIRCUMFERENCE * (1 - progress);
 
-  const timeNode = root.querySelector('#pomodoro-time');
-  const ringNode = root.querySelector('#pomodoro-ring');
-  const toggleNode = root.querySelector('#pomodoro-toggle');
-  const statusNode = root.querySelector('#pomodoro-status');
-  const completedNode = root.querySelector('#pomodoro-completed');
-  const nextNode = root.querySelector('#pomodoro-next');
-  const alarmNode = root.querySelector('#pomodoro-stop-alarm');
+  const timeNode = root.querySelector("#pomodoro-time");
+  const ringNode = root.querySelector("#pomodoro-ring");
+  const toggleNode = root.querySelector("#pomodoro-toggle");
+  const statusNode = root.querySelector("#pomodoro-status");
+  const completedNode = root.querySelector("#pomodoro-completed");
+  const nextNode = root.querySelector("#pomodoro-next");
+  const alarmNode = root.querySelector("#pomodoro-stop-alarm");
 
   if (timeNode) {
     timeNode.textContent = formatClock(state.remaining);
     timeNode.dateTime = isoDuration(state.remaining);
   }
-  const phaseNode = root.querySelector('#pomodoro-phase-label');
+  const phaseNode = root.querySelector("#pomodoro-phase-label");
   if (phaseNode) phaseNode.textContent = phase.label;
   if (ringNode) ringNode.style.strokeDashoffset = String(offset);
   if (toggleNode) {
     toggleNode.innerHTML = state.running
-      ? `${icon('icon-pause')}<span>Pausar</span>`
-      : `${icon('icon-play')}<span>Iniciar</span>`;
+      ? `${icon("icon-pause")}<span>Pausar</span>`
+      : `${icon("icon-play")}<span>Iniciar</span>`;
   }
-  if (statusNode) statusNode.textContent = state.running ? 'En curso' : 'En pausa';
+  if (statusNode) statusNode.textContent = state.running ? "En curso" : "En pausa";
   if (completedNode) {
     completedNode.textContent = String(state.completed);
   }
@@ -322,7 +322,7 @@ function render() {
 }
 
 export default {
-  meta: { title: 'Pomodoro' },
+  meta: { title: "Pomodoro" },
   render(root) {
     root.innerHTML = `
       <section class="app app--pomodoro" id="pomodoro-app">
@@ -339,10 +339,10 @@ export default {
             ${PHASES.map(
               (item) => `
               <input class="segmented__input" type="radio" name="pomodoro-phase" id="pomodoro-phase-${item.id}" value="${item.id}" ${
-                item.id === state.phase ? 'checked' : ''
+                item.id === state.phase ? "checked" : ""
               } />
               <label class="segmented__label" for="pomodoro-phase-${item.id}">${item.label}</label>`
-            ).join('')}
+            ).join("")}
           </fieldset>
 
           <div class="pomodoro__timer card">
@@ -366,11 +366,11 @@ export default {
             </div>
 
             <div class="pomodoro__controls">
-              <button class="button button--primary" id="pomodoro-toggle" type="button">${icon('icon-play')}<span>Iniciar</span></button>
-              <button class="button button--ghost" id="pomodoro-reset" type="button">${icon('icon-refresh')}<span>Reiniciar</span></button>
-              <button class="button button--ghost" id="pomodoro-skip" type="button">${icon('icon-chevron-right')}<span>Saltar</span></button>
+              <button class="button button--primary" id="pomodoro-toggle" type="button">${icon("icon-play")}<span>Iniciar</span></button>
+              <button class="button button--ghost" id="pomodoro-reset" type="button">${icon("icon-refresh")}<span>Reiniciar</span></button>
+              <button class="button button--ghost" id="pomodoro-skip" type="button">${icon("icon-chevron-right")}<span>Saltar</span></button>
               <button class="button button--ghost pomodoro__stop-alarm" id="pomodoro-stop-alarm" type="button" hidden>
-                ${icon('icon-stop')}<span>Detener alarma</span>
+                ${icon("icon-stop")}<span>Detener alarma</span>
               </button>
             </div>
           </div>
@@ -393,27 +393,27 @@ export default {
       render();
     });
 
-    root.querySelector('#pomodoro-toggle').addEventListener('click', () => {
+    root.querySelector("#pomodoro-toggle").addEventListener("click", () => {
       if (state.running) pausePomodoro();
       else startPomodoro();
     });
 
-    root.querySelector('#pomodoro-reset').addEventListener('click', () => {
+    root.querySelector("#pomodoro-reset").addEventListener("click", () => {
       resetPomodoro();
-      announce('Temporizador reiniciado');
+      announce("Temporizador reiniciado");
     });
 
-    root.querySelector('#pomodoro-skip').addEventListener('click', () => {
+    root.querySelector("#pomodoro-skip").addEventListener("click", () => {
       skipPhase();
     });
 
-    root.querySelector('#pomodoro-stop-alarm').addEventListener('click', () => {
+    root.querySelector("#pomodoro-stop-alarm").addEventListener("click", () => {
       stopAlarm();
-      announce('Alarma detenida');
+      announce("Alarma detenida");
     });
 
     root.querySelectorAll('input[name="pomodoro-phase"]').forEach((input) => {
-      input.addEventListener('change', () => selectPhase(input.value));
+      input.addEventListener("change", () => selectPhase(input.value));
     });
 
     const unsubscribeState = subscribePomodoro(render);

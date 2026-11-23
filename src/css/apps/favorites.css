@@ -28,7 +28,9 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  transition: border-color var(--transition), transform var(--transition);
+  transition:
+    border-color var(--transition),
+    transform var(--transition);
 
   &:hover {
     border-color: var(--accent);
@@ -90,7 +92,7 @@
   flex: none;
 }
 
-@media (max-width: 47.99rem) {
+@media (width <= 47.99rem) {
   .favorites__form {
     grid-template-columns: 1fr;
 

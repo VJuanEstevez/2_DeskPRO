@@ -4,12 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "oxlint src/",
-    "format": "oxfmt src/",
-    "deploy": "pnpm run build && gh-pages -d src/dist"
-  },
+      "dev": "vite",
+      "build": "vite build",
+      "deploy": "pnpm run build && gh-pages -d dist",
+      "lint:js": "oxlint src/",
+      "lint:js:fix": "oxlint --fix src/",
+      "lint:css": "stylelint \"src/**/*.css\"",
+      "lint:css:fix": "stylelint \"src/**/*.css\" --fix",
+      "format": "oxfmt src/",
+      "format:check": "oxfmt --check src/",
+      "check": "pnpm run lint:js && pnpm run lint:css && pnpm run format:check",
+      "fix": "pnpm run lint:js:fix && pnpm run lint:css:fix && pnpm run format"
+    },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -26,6 +32,8 @@
     "gh-pages": "^6.3.0",
     "oxfmt": "^0.77.0",
     "oxlint": "^1.92.0",
+    "stylelint": "^16.26.1",
+    "stylelint-config-standard": "^36.0.1",
     "vite": "^8.3.6"
   }
 }

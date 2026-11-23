@@ -131,7 +131,7 @@
   margin-top: var(--space-1);
 }
 
-@media (max-width: 60rem) {
+@media (width <= 60rem) {
   .textgen__layout {
     grid-template-columns: 1fr;
   }
@@ -141,7 +141,7 @@
   }
 }
 
-@media (max-width: 47.99rem) {
+@media (width <= 47.99rem) {
   .textgen__output {
     gap: var(--space-3);
   }

@@ -1,16 +1,16 @@
-import '../../css/apps/typography.css';
+import "../../css/apps/typography.css";
 
-import { read, write, announce } from '../store.js';
-import { icon, escapeHtml } from '../ui.js';
+import { read, write, announce } from "../store.js";
+import { icon, escapeHtml } from "../ui.js";
 import {
   HEADING_FONTS,
   DEFAULT_TYPOGRAPHY,
   findHeadingFont,
   findBodyFont,
   selectBodyFonts,
-} from '../data/fonts.js';
+} from "../data/fonts.js";
 
-const STORAGE_KEY = 'typography';
+const STORAGE_KEY = "typography";
 const HEADING_SIZE_RANGE = { min: 28, max: 80, fallback: DEFAULT_TYPOGRAPHY.headingSize };
 const BODY_SIZE_RANGE = { min: 14, max: 24, fallback: DEFAULT_TYPOGRAPHY.bodySize };
 const LINE_HEIGHT_RANGE = { min: 1.2, max: 2, fallback: DEFAULT_TYPOGRAPHY.lineHeight };
@@ -33,7 +33,7 @@ function clampNumber(value, range) {
  */
 function getState() {
   const stored = read(STORAGE_KEY, {});
-  const source = stored && typeof stored === 'object' ? stored : {};
+  const source = stored && typeof stored === "object" ? stored : {};
   const heading = findHeadingFont(source.headingFont);
   const bodyOptions = selectBodyFonts(heading.id);
   const bodyIds = bodyOptions.map((font) => font.id);
@@ -55,12 +55,13 @@ function saveState(patch) {
 }
 
 export default {
-  meta: { title: 'Tipografía' },
+  meta: { title: "Tipografía" },
   render(root) {
     const state = getState();
     const headingOptions = HEADING_FONTS.map(
-      (font) => `<option value="${font.id}" ${font.id === state.headingFont ? 'selected' : ''}>${escapeHtml(font.label)}</option>`
-    ).join('');
+      (font) =>
+        `<option value="${font.id}" ${font.id === state.headingFont ? "selected" : ""}>${escapeHtml(font.label)}</option>`
+    ).join("");
 
     root.innerHTML = `
       <section class="app app--typography">
@@ -70,7 +71,7 @@ export default {
             <p class="app__count">Encuentra una pareja para titulares y textos, y ajusta la escala en vivo.</p>
           </div>
           <button class="button button--ghost" id="type-reset" type="button">
-            ${icon('icon-refresh')}<span>Restablecer</span>
+            ${icon("icon-refresh")}<span>Restablecer</span>
           </button>
         </header>
 
@@ -178,30 +179,30 @@ export default {
         </div>
       </section>`;
 
-    const headingSelect = root.querySelector('#type-heading-font');
-    const bodySelect = root.querySelector('#type-body-font');
-    const headingNote = root.querySelector('#type-heading-note');
-    const bodyNote = root.querySelector('#type-body-note');
-    const pairings = root.querySelector('#type-pairings');
-    const pairLabel = root.querySelector('#type-pair-label');
-    const scaleReadout = root.querySelector('#type-scale-readout');
-    const specimen = root.querySelector('#type-specimen');
-    const caption = root.querySelector('#type-caption');
-    const headingSizeInput = root.querySelector('#type-heading-size');
-    const bodySizeInput = root.querySelector('#type-body-size');
-    const lineHeightInput = root.querySelector('#type-line-height');
-    const headingSizeOutput = root.querySelector('#type-heading-size-output');
-    const bodySizeOutput = root.querySelector('#type-body-size-output');
-    const lineHeightOutput = root.querySelector('#type-line-height-output');
+    const headingSelect = root.querySelector("#type-heading-font");
+    const bodySelect = root.querySelector("#type-body-font");
+    const headingNote = root.querySelector("#type-heading-note");
+    const bodyNote = root.querySelector("#type-body-note");
+    const pairings = root.querySelector("#type-pairings");
+    const pairLabel = root.querySelector("#type-pair-label");
+    const scaleReadout = root.querySelector("#type-scale-readout");
+    const specimen = root.querySelector("#type-specimen");
+    const caption = root.querySelector("#type-caption");
+    const headingSizeInput = root.querySelector("#type-heading-size");
+    const bodySizeInput = root.querySelector("#type-body-size");
+    const lineHeightInput = root.querySelector("#type-line-height");
+    const headingSizeOutput = root.querySelector("#type-heading-size-output");
+    const bodySizeOutput = root.querySelector("#type-body-size-output");
+    const lineHeightOutput = root.querySelector("#type-line-height-output");
 
     const paintBodyOptions = (selectedId) => {
       const options = selectBodyFonts(headingSelect.value);
       bodySelect.innerHTML = options
         .map(
           (font) =>
-            `<option value="${font.id}" ${font.id === selectedId ? 'selected' : ''}>${escapeHtml(font.label)}</option>`
+            `<option value="${font.id}" ${font.id === selectedId ? "selected" : ""}>${escapeHtml(font.label)}</option>`
         )
-        .join('');
+        .join("");
       return options.some((font) => font.id === selectedId) ? selectedId : options[0].id;
     };
 
@@ -210,25 +211,28 @@ export default {
       pairings.innerHTML = options
         .map(
           (font) =>
-            `<li class="type__pair-chip${font.id === bodySelect.value ? ' is-active' : ''}">${escapeHtml(
+            `<li class="type__pair-chip${font.id === bodySelect.value ? " is-active" : ""}">${escapeHtml(
               font.label
             )}</li>`
         )
-        .join('');
+        .join("");
     };
 
     const paintPreview = () => {
       const current = getState();
       const heading = findHeadingFont(current.headingFont);
       const body = findBodyFont(current.bodyFont);
-      const headingRem = (current.headingSize / 16).toFixed(3).replace(/0+$/, '').replace(/\.$/, '');
-      const bodyRem = (current.bodySize / 16).toFixed(3).replace(/0+$/, '').replace(/\.$/, '');
+      const headingRem = (current.headingSize / 16)
+        .toFixed(3)
+        .replace(/0+$/, "")
+        .replace(/\.$/, "");
+      const bodyRem = (current.bodySize / 16).toFixed(3).replace(/0+$/, "").replace(/\.$/, "");
 
-      specimen.style.setProperty('--specimen-heading-font', heading.stack);
-      specimen.style.setProperty('--specimen-body-font', body.stack);
-      specimen.style.setProperty('--specimen-heading-size', `${headingRem}rem`);
-      specimen.style.setProperty('--specimen-body-size', `${bodyRem}rem`);
-      specimen.style.setProperty('--specimen-line-height', String(current.lineHeight));
+      specimen.style.setProperty("--specimen-heading-font", heading.stack);
+      specimen.style.setProperty("--specimen-body-font", body.stack);
+      specimen.style.setProperty("--specimen-heading-size", `${headingRem}rem`);
+      specimen.style.setProperty("--specimen-body-size", `${bodyRem}rem`);
+      specimen.style.setProperty("--specimen-line-height", String(current.lineHeight));
 
       headingSizeOutput.textContent = `${current.headingSize} px`;
       bodySizeOutput.textContent = `${current.bodySize} px`;
@@ -249,10 +253,12 @@ export default {
       paintPreview();
     };
 
-    headingSelect.addEventListener('change', () => {
+    headingSelect.addEventListener("change", () => {
       const previous = getState();
       const options = selectBodyFonts(headingSelect.value);
-      const bodyId = options.some((font) => font.id === previous.bodyFont) ? previous.bodyFont : options[0].id;
+      const bodyId = options.some((font) => font.id === previous.bodyFont)
+        ? previous.bodyFont
+        : options[0].id;
       saveState({ headingFont: headingSelect.value, bodyFont: bodyId });
       sync();
       if (bodyId !== previous.bodyFont) {
@@ -260,28 +266,28 @@ export default {
       }
     });
 
-    bodySelect.addEventListener('change', () => {
+    bodySelect.addEventListener("change", () => {
       saveState({ bodyFont: bodySelect.value });
       paintPairings();
       paintPreview();
     });
 
-    headingSizeInput.addEventListener('input', () => {
+    headingSizeInput.addEventListener("input", () => {
       saveState({ headingSize: Number(headingSizeInput.value) });
       paintPreview();
     });
 
-    bodySizeInput.addEventListener('input', () => {
+    bodySizeInput.addEventListener("input", () => {
       saveState({ bodySize: Number(bodySizeInput.value) });
       paintPreview();
     });
 
-    lineHeightInput.addEventListener('input', () => {
+    lineHeightInput.addEventListener("input", () => {
       saveState({ lineHeight: Number(lineHeightInput.value) });
       paintPreview();
     });
 
-    root.querySelector('#type-reset').addEventListener('click', () => {
+    root.querySelector("#type-reset").addEventListener("click", () => {
       write(STORAGE_KEY, { ...DEFAULT_TYPOGRAPHY });
       const defaults = getState();
       headingSelect.value = defaults.headingFont;
@@ -291,7 +297,7 @@ export default {
       lineHeightInput.value = String(defaults.lineHeight);
       paintPairings();
       paintPreview();
-      announce('Tipografía restablecida');
+      announce("Tipografía restablecida");
     });
 
     sync();

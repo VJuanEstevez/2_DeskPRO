@@ -1,17 +1,17 @@
-import '../../css/apps/textgen.css';
+import "../../css/apps/textgen.css";
 
-import { read, write, announce } from '../store.js';
-import { icon, escapeHtml, copyText } from '../ui.js';
-import { TEXT_THEMES, findTextTheme } from '../data/text-themes.js';
+import { read, write, announce } from "../store.js";
+import { icon, escapeHtml, copyText } from "../ui.js";
+import { TEXT_THEMES, findTextTheme } from "../data/text-themes.js";
 
-const STORAGE_KEY = 'text-generator';
+const STORAGE_KEY = "text-generator";
 
 const DEFAULT_TEXT_STATE = {
-  theme: 'sci-fi',
+  theme: "sci-fi",
   paragraphs: 3,
   sentences: 4,
   includeTitle: true,
-  output: { title: '', paragraphs: [] },
+  output: { title: "", paragraphs: [] },
 };
 
 /**
@@ -110,7 +110,7 @@ export function generateText(theme, paragraphCount, sentenceCount) {
       sentences.push(fillTemplate(beat, slots));
     }
     if (sentenceCount > 1) sentences.push(fillTemplate(closers(), slots));
-    paragraphs.push(sentences.join(' '));
+    paragraphs.push(sentences.join(" "));
   }
 
   return { title: titles(), paragraphs };
@@ -121,10 +121,10 @@ export function generateText(theme, paragraphCount, sentenceCount) {
  */
 export function getTextState() {
   const stored = read(STORAGE_KEY, {});
-  const source = stored && typeof stored === 'object' ? stored : {};
-  const output = source.output && typeof source.output === 'object' ? source.output : {};
+  const source = stored && typeof stored === "object" ? stored : {};
+  const output = source.output && typeof source.output === "object" ? source.output : {};
   const paragraphs = Array.isArray(output.paragraphs)
-    ? output.paragraphs.filter((paragraph) => typeof paragraph === 'string' && paragraph.trim())
+    ? output.paragraphs.filter((paragraph) => typeof paragraph === "string" && paragraph.trim())
     : [];
 
   return {
@@ -133,14 +133,14 @@ export function getTextState() {
     sentences: clampInt(source.sentences, 2, 6, DEFAULT_TEXT_STATE.sentences),
     includeTitle: source.includeTitle !== false,
     output: {
-      title: typeof output.title === 'string' ? output.title : '',
+      title: typeof output.title === "string" ? output.title : "",
       paragraphs,
     },
   };
 }
 
 export default {
-  meta: { title: 'Generador de textos' },
+  meta: { title: "Generador de textos" },
   render(root) {
     let state = getTextState();
     const initialTheme = findTextTheme(state.theme);
@@ -153,7 +153,7 @@ export default {
             <p class="app__count">Sinopsis de película por temática, con control de párrafos y frases.</p>
           </div>
           <button class="button button--ghost" id="textgen-copy" type="button">
-            ${icon('icon-copy')}<span>Copiar texto</span>
+            ${icon("icon-copy")}<span>Copiar texto</span>
           </button>
         </header>
 
@@ -164,10 +164,10 @@ export default {
               <select class="field__control" id="textgen-theme" name="theme">
                 ${TEXT_THEMES.map(
                   (theme) =>
-                    `<option value="${theme.id}" ${theme.id === state.theme ? 'selected' : ''}>${escapeHtml(
+                    `<option value="${theme.id}" ${theme.id === state.theme ? "selected" : ""}>${escapeHtml(
                       theme.label
                     )}</option>`
-                ).join('')}
+                ).join("")}
               </select>
               <p class="field__hint" id="textgen-theme-note">${escapeHtml(initialTheme.tagline)}</p>
             </div>
@@ -207,14 +207,14 @@ export default {
             </div>
 
             <label class="check">
-              <input class="check__input" id="textgen-title-toggle" type="checkbox" ${state.includeTitle ? 'checked' : ''} />
-              <span class="check__box" aria-hidden="true">${icon('icon-check-circle', { size: 14 })}</span>
+              <input class="check__input" id="textgen-title-toggle" type="checkbox" ${state.includeTitle ? "checked" : ""} />
+              <span class="check__box" aria-hidden="true">${icon("icon-check-circle", { size: 14 })}</span>
               <span class="check__label">Incluir título de película</span>
             </label>
 
             <div class="textgen__actions">
               <button class="button button--primary" type="submit">
-                ${icon('icon-refresh')}<span>Generar de nuevo</span>
+                ${icon("icon-refresh")}<span>Generar de nuevo</span>
               </button>
             </div>
 
@@ -238,26 +238,26 @@ export default {
         </div>
       </section>`;
 
-    const form = root.querySelector('#textgen-form');
-    const themeSelect = root.querySelector('#textgen-theme');
-    const themeNote = root.querySelector('#textgen-theme-note');
-    const themeLabel = root.querySelector('#textgen-theme-label');
-    const paragraphsInput = root.querySelector('#textgen-paragraphs');
-    const paragraphsOutput = root.querySelector('#textgen-paragraphs-output');
-    const sentencesInput = root.querySelector('#textgen-sentences');
-    const sentencesOutput = root.querySelector('#textgen-sentences-output');
-    const titleToggle = root.querySelector('#textgen-title-toggle');
-    const titleNode = root.querySelector('#textgen-title');
-    const bodyNode = root.querySelector('#textgen-output');
-    const metaNode = root.querySelector('#textgen-meta');
-    const copyButton = root.querySelector('#textgen-copy');
+    const form = root.querySelector("#textgen-form");
+    const themeSelect = root.querySelector("#textgen-theme");
+    const themeNote = root.querySelector("#textgen-theme-note");
+    const themeLabel = root.querySelector("#textgen-theme-label");
+    const paragraphsInput = root.querySelector("#textgen-paragraphs");
+    const paragraphsOutput = root.querySelector("#textgen-paragraphs-output");
+    const sentencesInput = root.querySelector("#textgen-sentences");
+    const sentencesOutput = root.querySelector("#textgen-sentences-output");
+    const titleToggle = root.querySelector("#textgen-title-toggle");
+    const titleNode = root.querySelector("#textgen-title");
+    const bodyNode = root.querySelector("#textgen-output");
+    const metaNode = root.querySelector("#textgen-meta");
+    const copyButton = root.querySelector("#textgen-copy");
 
     const formatOutput = () => {
-      if (state.output.paragraphs.length === 0) return '';
+      if (state.output.paragraphs.length === 0) return "";
       const parts = [];
       if (state.includeTitle && state.output.title) parts.push(state.output.title);
       parts.push(...state.output.paragraphs);
-      return parts.join('\n\n');
+      return parts.join("\n\n");
     };
 
     const paintOutput = () => {
@@ -268,19 +268,22 @@ export default {
       const hasOutput = state.output.paragraphs.length > 0;
       if (!hasOutput) {
         titleNode.hidden = true;
-        bodyNode.innerHTML = '<p class="textgen__placeholder">Pulsa «Generar de nuevo» para crear una sinopsis.</p>';
-        metaNode.textContent = '';
+        bodyNode.innerHTML =
+          '<p class="textgen__placeholder">Pulsa «Generar de nuevo» para crear una sinopsis.</p>';
+        metaNode.textContent = "";
         return;
       }
 
       titleNode.hidden = !state.includeTitle || !state.output.title;
       titleNode.textContent = state.output.title;
-      bodyNode.innerHTML = state.output.paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join('');
+      bodyNode.innerHTML = state.output.paragraphs
+        .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
+        .join("");
 
-      const words = state.output.paragraphs.join(' ').split(/\s+/).filter(Boolean).length;
+      const words = state.output.paragraphs.join(" ").split(/\s+/).filter(Boolean).length;
       const minutes = Math.max(1, Math.ceil(words / 200));
       metaNode.textContent = `${state.output.paragraphs.length} párrafo${
-        state.output.paragraphs.length === 1 ? '' : 's'
+        state.output.paragraphs.length === 1 ? "" : "s"
       } · ${words} palabras · ${minutes} min de lectura`;
     };
 
@@ -292,55 +295,55 @@ export default {
       };
       write(STORAGE_KEY, state);
       paintOutput();
-      if (notify) announce('Texto generado');
+      if (notify) announce("Texto generado");
     };
 
-    themeSelect.addEventListener('change', () => {
+    themeSelect.addEventListener("change", () => {
       state = { ...state, theme: themeSelect.value };
       regenerate();
     });
 
-    paragraphsInput.addEventListener('input', () => {
+    paragraphsInput.addEventListener("input", () => {
       paragraphsOutput.textContent = paragraphsInput.value;
     });
 
-    paragraphsInput.addEventListener('change', () => {
+    paragraphsInput.addEventListener("change", () => {
       state = { ...state, paragraphs: Number(paragraphsInput.value) };
       regenerate();
     });
 
-    sentencesInput.addEventListener('input', () => {
+    sentencesInput.addEventListener("input", () => {
       sentencesOutput.textContent = sentencesInput.value;
     });
 
-    sentencesInput.addEventListener('change', () => {
+    sentencesInput.addEventListener("change", () => {
       state = { ...state, sentences: Number(sentencesInput.value) };
       regenerate();
     });
 
-    titleToggle.addEventListener('change', () => {
+    titleToggle.addEventListener("change", () => {
       state = { ...state, includeTitle: titleToggle.checked };
       write(STORAGE_KEY, state);
       paintOutput();
     });
 
-    form.addEventListener('submit', (event) => {
+    form.addEventListener("submit", (event) => {
       event.preventDefault();
       regenerate(true);
     });
 
-    copyButton.addEventListener('click', async () => {
+    copyButton.addEventListener("click", async () => {
       const text = formatOutput();
       if (!text) {
-        announce('Genera una sinopsis primero');
+        announce("Genera una sinopsis primero");
         return;
       }
 
       try {
         await copyText(text);
-        announce('Texto copiado al portapapeles');
-      } catch (error) {
-        announce('No se pudo copiar el texto');
+        announce("Texto copiado al portapapeles");
+      } catch {
+        announce("No se pudo copiar el texto");
       }
     });
 

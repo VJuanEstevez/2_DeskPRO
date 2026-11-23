@@ -1,53 +1,53 @@
-import '../../css/apps/color.css';
+import "../../css/apps/color.css";
 
-import { read, write, announce } from '../store.js';
-import { icon, copyText, escapeHtml } from '../ui.js';
+import { read, write, announce } from "../store.js";
+import { icon, copyText, escapeHtml } from "../ui.js";
 
-const STORAGE_KEY = 'color-studio';
+const STORAGE_KEY = "color-studio";
 
 export const DEFAULT_COLOR = {
   hue: 214,
   saturation: 76,
   lightness: 56,
-  harmony: 'analogous',
-  scheme: 'dark',
+  harmony: "analogous",
+  scheme: "dark",
 };
 
 export const HARMONIES = [
   {
-    id: 'complementary',
-    label: 'Complementaria',
-    description: 'Dos tonos opuestos en la rueda. Máximo contraste cromático.',
+    id: "complementary",
+    label: "Complementaria",
+    description: "Dos tonos opuestos en la rueda. Máximo contraste cromático.",
     offsets: [0, 180],
-    names: ['Base', 'Complementario'],
+    names: ["Base", "Complementario"],
   },
   {
-    id: 'analogous',
-    label: 'Análoga',
-    description: 'Tonos vecinos en la rueda. Una paleta serena y cohesionada.',
+    id: "analogous",
+    label: "Análoga",
+    description: "Tonos vecinos en la rueda. Una paleta serena y cohesionada.",
     offsets: [-30, 0, 30],
-    names: ['Análogo frío', 'Base', 'Análogo cálido'],
+    names: ["Análogo frío", "Base", "Análogo cálido"],
   },
   {
-    id: 'triadic',
-    label: 'Triádica',
-    description: 'Tres tonos equidistantes. Vitalidad sin perder el equilibrio.',
+    id: "triadic",
+    label: "Triádica",
+    description: "Tres tonos equidistantes. Vitalidad sin perder el equilibrio.",
     offsets: [0, 120, 240],
-    names: ['Base', 'Tríada +120°', 'Tríada +240°'],
+    names: ["Base", "Tríada +120°", "Tríada +240°"],
   },
   {
-    id: 'tetradic',
-    label: 'Tetrádica',
-    description: 'Cuatro tonos en dos parejas complementarias. Rica y versátil.',
+    id: "tetradic",
+    label: "Tetrádica",
+    description: "Cuatro tonos en dos parejas complementarias. Rica y versátil.",
     offsets: [0, 90, 180, 270],
-    names: ['Base', 'Tetra +90°', 'Oposición', 'Tetra +270°'],
+    names: ["Base", "Tetra +90°", "Oposición", "Tetra +270°"],
   },
   {
-    id: 'monochromatic',
-    label: 'Monocromática',
-    description: 'Un solo matiz con distintas luminosidades. Orden y profundidad.',
+    id: "monochromatic",
+    label: "Monocromática",
+    description: "Un solo matiz con distintas luminosidades. Orden y profundidad.",
     offsets: [0],
-    names: ['Sombra', 'Sombra suave', 'Base', 'Luz suave', 'Luz'],
+    names: ["Sombra", "Sombra suave", "Base", "Luz suave", "Luz"],
   },
 ];
 
@@ -134,8 +134,8 @@ function hslToRgb(hue, saturation, lightness) {
  */
 function rgbToHex(rgb) {
   return `#${[rgb.r, rgb.g, rgb.b]
-    .map((channel) => clamp(Math.round(channel), 0, 255).toString(16).padStart(2, '0'))
-    .join('')}`;
+    .map((channel) => clamp(Math.round(channel), 0, 255).toString(16).padStart(2, "0"))
+    .join("")}`;
 }
 
 /**
@@ -143,13 +143,14 @@ function rgbToHex(rgb) {
  * @returns {{r: number, g: number, b: number}}
  */
 function hexToRgb(hex) {
-  const clean = String(hex).replace('#', '');
-  const value = clean.length === 3
-    ? clean
-        .split('')
-        .map((channel) => channel + channel)
-        .join('')
-    : clean;
+  const clean = String(hex).replace("#", "");
+  const value =
+    clean.length === 3
+      ? clean
+          .split("")
+          .map((channel) => channel + channel)
+          .join("")
+      : clean;
   const numeric = Number.parseInt(value, 16);
   if (!Number.isFinite(numeric)) return { r: 0, g: 0, b: 0 };
   return {
@@ -233,7 +234,7 @@ export function contrastRatio(foreground, background) {
  * @returns {string} black or white, whichever reads better on top
  */
 function bestInk(hex) {
-  return contrastRatio('#000000', hex) >= contrastRatio('#ffffff', hex) ? '#000000' : '#ffffff';
+  return contrastRatio("#000000", hex) >= contrastRatio("#ffffff", hex) ? "#000000" : "#ffffff";
 }
 
 /**
@@ -273,13 +274,13 @@ function toNumber(value, fallback) {
  */
 export function getColorState() {
   const stored = read(STORAGE_KEY, {});
-  const source = stored && typeof stored === 'object' ? stored : {};
+  const source = stored && typeof stored === "object" ? stored : {};
   return {
     hue: Math.round(clamp(toNumber(source.hue, DEFAULT_COLOR.hue), 0, 360)),
     saturation: Math.round(clamp(toNumber(source.saturation, DEFAULT_COLOR.saturation), 0, 100)),
     lightness: Math.round(clamp(toNumber(source.lightness, DEFAULT_COLOR.lightness), 0, 100)),
     harmony: findHarmony(source.harmony).id,
-    scheme: source.scheme === 'light' ? 'light' : 'dark',
+    scheme: source.scheme === "light" ? "light" : "dark",
   };
 }
 
@@ -290,7 +291,7 @@ export function getColorState() {
 export function buildHarmony(state) {
   const harmony = findHarmony(state.harmony);
 
-  if (harmony.id === 'monochromatic') {
+  if (harmony.id === "monochromatic") {
     const steps = [-28, -14, 0, 14, 28];
     return steps.map((offset, index) => ({
       ...makeColor(state.hue, state.saturation, state.lightness + offset),
@@ -332,10 +333,10 @@ function tuneToContrast(color, background, target, direction) {
  * @returns {{level: string, label: string, pass: boolean}}
  */
 function contrastLevel(ratio, target) {
-  if (ratio >= 7) return { level: 'aaa', label: 'AAA', pass: true };
-  if (ratio >= 4.5) return { level: 'aa', label: 'AA', pass: true };
-  if (ratio >= 3 && target <= 3) return { level: 'aa', label: 'AA · 3:1', pass: true };
-  return { level: 'fail', label: 'No cumple', pass: false };
+  if (ratio >= 7) return { level: "aaa", label: "AAA", pass: true };
+  if (ratio >= 4.5) return { level: "aa", label: "AA", pass: true };
+  if (ratio >= 3 && target <= 3) return { level: "aa", label: "AA · 3:1", pass: true };
+  return { level: "fail", label: "No cumple", pass: false };
 }
 
 /**
@@ -354,9 +355,24 @@ export function buildNeutrals(state) {
   // Surface 2 is the closest panel to the text color, so it is the most
   // demanding reference: any pair that passes here also passes on the rest.
   const reference = surface2.hex;
-  const border = tuneToContrast(makeColor(hue, Math.max(6, tint - 3), scheme.border), reference, 3, direction);
-  const text = tuneToContrast(makeColor(hue, Math.max(8, tint - 4), scheme.text), reference, 4.5, direction);
-  const muted = tuneToContrast(makeColor(hue, Math.max(8, tint - 6), scheme.muted), reference, 4.5, direction);
+  const border = tuneToContrast(
+    makeColor(hue, Math.max(6, tint - 3), scheme.border),
+    reference,
+    3,
+    direction
+  );
+  const text = tuneToContrast(
+    makeColor(hue, Math.max(8, tint - 4), scheme.text),
+    reference,
+    4.5,
+    direction
+  );
+  const muted = tuneToContrast(
+    makeColor(hue, Math.max(8, tint - 6), scheme.muted),
+    reference,
+    4.5,
+    direction
+  );
   const accent = tuneToContrast(
     makeColor(hue, state.saturation, state.lightness),
     reference,
@@ -407,18 +423,18 @@ export function buildNeutrals(state) {
  */
 function neutralRows(palette) {
   return [
-    { id: 'background', name: 'Fondo', color: palette.background },
-    { id: 'surface', name: 'Superficie', color: palette.surface },
-    { id: 'surface-2', name: 'Superficie 2', color: palette.surface2 },
-    { id: 'border', name: 'Borde', color: palette.border, check: palette.checks.border },
-    { id: 'text', name: 'Texto', color: palette.text, check: palette.checks.text },
-    { id: 'muted', name: 'Texto secundario', color: palette.muted, check: palette.checks.muted },
-    { id: 'accent', name: 'Acento', color: palette.accent, check: palette.checks.accent },
+    { id: "background", name: "Fondo", color: palette.background },
+    { id: "surface", name: "Superficie", color: palette.surface },
+    { id: "surface-2", name: "Superficie 2", color: palette.surface2 },
+    { id: "border", name: "Borde", color: palette.border, check: palette.checks.border },
+    { id: "text", name: "Texto", color: palette.text, check: palette.checks.text },
+    { id: "muted", name: "Texto secundario", color: palette.muted, check: palette.checks.muted },
+    { id: "accent", name: "Acento", color: palette.accent, check: palette.checks.accent },
   ];
 }
 
 export default {
-  meta: { title: 'Color' },
+  meta: { title: "Color" },
   render(root) {
     let state = getColorState();
     let saveTimer = null;
@@ -434,10 +450,10 @@ export default {
     const harmonyOptions = HARMONIES.map(
       (harmony) => `
         <input class="segmented__input" type="radio" name="color-harmony" id="color-harmony-${harmony.id}" value="${harmony.id}" ${
-          harmony.id === state.harmony ? 'checked' : ''
+          harmony.id === state.harmony ? "checked" : ""
         } />
         <label class="segmented__label" for="color-harmony-${harmony.id}">${escapeHtml(harmony.label)}</label>`
-    ).join('');
+    ).join("");
 
     root.innerHTML = `
       <section class="app app--color">
@@ -447,7 +463,7 @@ export default {
             <p class="app__count">Elige un color base, explora armonías y genera neutros con contraste WCAG AA.</p>
           </div>
           <button class="button button--ghost" id="color-reset" type="button">
-            ${icon('icon-refresh')}<span>Restablecer</span>
+            ${icon("icon-refresh")}<span>Restablecer</span>
           </button>
         </header>
 
@@ -515,7 +531,7 @@ export default {
               <div class="color__harmony-actions">
                 <output class="color__harmony-name" id="color-harmony-name"></output>
                 <button class="button button--ghost" id="color-copy-harmony" type="button">
-                  ${icon('icon-copy', { size: 16 })}<span>Copiar armonía</span>
+                  ${icon("icon-copy", { size: 16 })}<span>Copiar armonía</span>
                 </button>
               </div>
             </header>
@@ -537,17 +553,17 @@ export default {
               </div>
 
               <button class="button button--ghost" id="color-copy-neutrals" type="button">
-                ${icon('icon-copy', { size: 16 })}<span>Seleccionar paleta</span>
+                ${icon("icon-copy", { size: 16 })}<span>Seleccionar paleta</span>
               </button>
 
               <fieldset class="segmented color__scheme" id="color-scheme">
                 <legend class="sr-only">Esquema de la interfaz</legend>
                 <input class="segmented__input" type="radio" name="color-scheme" id="color-scheme-dark" value="dark" ${
-                  state.scheme === 'dark' ? 'checked' : ''
+                  state.scheme === "dark" ? "checked" : ""
                 } />
                 <label class="segmented__label" for="color-scheme-dark">Oscuro</label>
                 <input class="segmented__input" type="radio" name="color-scheme" id="color-scheme-light" value="light" ${
-                  state.scheme === 'light' ? 'checked' : ''
+                  state.scheme === "light" ? "checked" : ""
                 } />
                 <label class="segmented__label" for="color-scheme-light">Claro</label>
               </fieldset>
@@ -576,25 +592,25 @@ export default {
         </div>
       </section>`;
 
-    const wheel = root.querySelector('#color-wheel');
-    const wheelHandle = root.querySelector('#color-wheel-handle');
-    const nativeInput = root.querySelector('#color-base-input');
-    const baseHex = root.querySelector('#color-base-hex');
-    const harmonyName = root.querySelector('#color-harmony-name');
-    const harmonyNote = root.querySelector('#color-harmony-note');
-    const swatches = root.querySelector('#color-swatches');
-    const rules = root.querySelector('#color-rules');
-    const schemeField = root.querySelector('#color-scheme');
-    const tokens = root.querySelector('#color-tokens');
-    const preview = root.querySelector('#color-preview');
-    const contrastSummary = root.querySelector('#color-contrast-summary');
-    const section = root.querySelector('.app--color');
-    const hueInput = root.querySelector('#color-hue');
-    const saturationInput = root.querySelector('#color-saturation');
-    const lightnessInput = root.querySelector('#color-lightness');
-    const hueOutput = root.querySelector('#color-hue-output');
-    const saturationOutput = root.querySelector('#color-saturation-output');
-    const lightnessOutput = root.querySelector('#color-lightness-output');
+    const wheel = root.querySelector("#color-wheel");
+    const wheelHandle = root.querySelector("#color-wheel-handle");
+    const nativeInput = root.querySelector("#color-base-input");
+    const baseHex = root.querySelector("#color-base-hex");
+    const harmonyName = root.querySelector("#color-harmony-name");
+    const harmonyNote = root.querySelector("#color-harmony-note");
+    const swatches = root.querySelector("#color-swatches");
+    const rules = root.querySelector("#color-rules");
+    const schemeField = root.querySelector("#color-scheme");
+    const tokens = root.querySelector("#color-tokens");
+    const preview = root.querySelector("#color-preview");
+    const contrastSummary = root.querySelector("#color-contrast-summary");
+    const section = root.querySelector(".app--color");
+    const hueInput = root.querySelector("#color-hue");
+    const saturationInput = root.querySelector("#color-saturation");
+    const lightnessInput = root.querySelector("#color-lightness");
+    const hueOutput = root.querySelector("#color-hue-output");
+    const saturationOutput = root.querySelector("#color-saturation-output");
+    const lightnessOutput = root.querySelector("#color-lightness-output");
 
     const syncRadio = (container, value) => {
       container.querySelectorAll('input[type="radio"]').forEach((input) => {
@@ -609,8 +625,8 @@ export default {
 
       wheelHandle.style.left = `${50 + Math.cos(angle) * distance}%`;
       wheelHandle.style.top = `${50 + Math.sin(angle) * distance}%`;
-      wheelHandle.style.setProperty('--wheel-color', hex);
-      wheel.style.setProperty('--wheel-color', hex);
+      wheelHandle.style.setProperty("--wheel-color", hex);
+      wheel.style.setProperty("--wheel-color", hex);
 
       nativeInput.value = hex;
       baseHex.textContent = hex.toUpperCase();
@@ -628,7 +644,7 @@ export default {
 
       harmonyName.textContent = harmony.label;
       harmonyNote.textContent = harmony.description;
-      swatches.classList.toggle('color__swatches--five', harmony.id === 'monochromatic');
+      swatches.classList.toggle("color__swatches--five", harmony.id === "monochromatic");
       swatches.innerHTML = colors
         .map(
           (color) => `
@@ -646,7 +662,7 @@ export default {
             </button>
           </li>`
         )
-        .join('');
+        .join("");
     };
 
     const paintNeutrals = () => {
@@ -678,22 +694,22 @@ export default {
             </button>
           </li>`
         )
-        .join('');
+        .join("");
 
-      preview.style.setProperty('--preview-bg', palette.background.hex);
-      preview.style.setProperty('--preview-surface', palette.surface.hex);
-      preview.style.setProperty('--preview-surface-2', palette.surface2.hex);
-      preview.style.setProperty('--preview-border', palette.border.hex);
-      preview.style.setProperty('--preview-text', palette.text.hex);
-      preview.style.setProperty('--preview-muted', palette.muted.hex);
-      preview.style.setProperty('--preview-accent', palette.accent.hex);
-      preview.style.setProperty('--preview-on-accent', palette.onAccent);
+      preview.style.setProperty("--preview-bg", palette.background.hex);
+      preview.style.setProperty("--preview-surface", palette.surface.hex);
+      preview.style.setProperty("--preview-surface-2", palette.surface2.hex);
+      preview.style.setProperty("--preview-border", palette.border.hex);
+      preview.style.setProperty("--preview-text", palette.text.hex);
+      preview.style.setProperty("--preview-muted", palette.muted.hex);
+      preview.style.setProperty("--preview-accent", palette.accent.hex);
+      preview.style.setProperty("--preview-on-accent", palette.onAccent);
 
       const failing = Object.values(palette.checks).filter((check) => !check.pass);
       contrastSummary.textContent =
         failing.length === 0
-          ? 'Todos los pares de texto y componentes cumplen AA en fondo y superficies.'
-          : 'Ajusta el color base: algún par no alcanza el mínimo AA.';
+          ? "Todos los pares de texto y componentes cumplen AA en fondo y superficies."
+          : "Ajusta el color base: algún par no alcanza el mínimo AA.";
     };
 
     const paintAll = () => {
@@ -726,15 +742,15 @@ export default {
       updateState({ hue, saturation });
     };
 
-    wheel.addEventListener('pointerdown', (event) => {
-      if (event.pointerType === 'mouse' && event.button !== 0) return;
+    wheel.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "mouse" && event.button !== 0) return;
       wheelPointer = event.pointerId;
       wheel.setPointerCapture(event.pointerId);
       updateFromPointer(event);
       event.preventDefault();
     });
 
-    wheel.addEventListener('pointermove', (event) => {
+    wheel.addEventListener("pointermove", (event) => {
       if (wheelPointer !== event.pointerId) return;
       updateFromPointer(event);
     });
@@ -745,70 +761,74 @@ export default {
       if (wheel.hasPointerCapture(event.pointerId)) wheel.releasePointerCapture(event.pointerId);
     };
 
-    wheel.addEventListener('pointerup', endWheelDrag);
-    wheel.addEventListener('pointercancel', endWheelDrag);
+    wheel.addEventListener("pointerup", endWheelDrag);
+    wheel.addEventListener("pointercancel", endWheelDrag);
 
-    nativeInput.addEventListener('input', () => {
+    nativeInput.addEventListener("input", () => {
       const hsl = hexToHsl(nativeInput.value);
       updateState({ hue: hsl.h, saturation: hsl.s, lightness: hsl.l });
     });
 
-    hueInput.addEventListener('input', () => updateState({ hue: Number(hueInput.value) }));
-    saturationInput.addEventListener('input', () => updateState({ saturation: Number(saturationInput.value) }));
-    lightnessInput.addEventListener('input', () => updateState({ lightness: Number(lightnessInput.value) }));
+    hueInput.addEventListener("input", () => updateState({ hue: Number(hueInput.value) }));
+    saturationInput.addEventListener("input", () =>
+      updateState({ saturation: Number(saturationInput.value) })
+    );
+    lightnessInput.addEventListener("input", () =>
+      updateState({ lightness: Number(lightnessInput.value) })
+    );
 
-    rules.addEventListener('change', (event) => {
-      if (event.target.name !== 'color-harmony') return;
+    rules.addEventListener("change", (event) => {
+      if (event.target.name !== "color-harmony") return;
       updateState({ harmony: event.target.value });
     });
 
-    schemeField.addEventListener('change', (event) => {
-      if (event.target.name !== 'color-scheme') return;
+    schemeField.addEventListener("change", (event) => {
+      if (event.target.name !== "color-scheme") return;
       updateState({ scheme: event.target.value });
     });
 
-    section.addEventListener('click', async (event) => {
-      const button = event.target.closest('[data-copy]');
+    section.addEventListener("click", async (event) => {
+      const button = event.target.closest("[data-copy]");
       if (!button) return;
 
       try {
         await copyText(button.dataset.copy);
         announce(`Color ${button.dataset.copy.toUpperCase()} copiado`);
-      } catch (error) {
-        announce('No se pudo copiar el color');
+      } catch {
+        announce("No se pudo copiar el color");
       }
     });
 
-    root.querySelector('#color-copy-harmony').addEventListener('click', async () => {
+    root.querySelector("#color-copy-harmony").addEventListener("click", async () => {
       const harmony = findHarmony(state.harmony);
       const values = buildHarmony(state).map((color) => color.hex.toUpperCase());
 
       try {
-        await copyText(values.join(', '));
+        await copyText(values.join(", "));
         announce(`Armonía ${harmony.label} copiada`);
-      } catch (error) {
-        announce('No se pudo copiar la armonía');
+      } catch {
+        announce("No se pudo copiar la armonía");
       }
     });
 
-    root.querySelector('#color-copy-neutrals').addEventListener('click', async () => {
+    root.querySelector("#color-copy-neutrals").addEventListener("click", async () => {
       const text = neutralRows(buildNeutrals(state))
         .map((row) => `${row.name}: ${row.color.hex.toUpperCase()}`)
-        .join('\n');
+        .join("\n");
 
       try {
         await copyText(text);
-        announce('Paleta de neutros copiada');
-      } catch (error) {
-        announce('No se pudo copiar la paleta');
+        announce("Paleta de neutros copiada");
+      } catch {
+        announce("No se pudo copiar la paleta");
       }
     });
 
-    root.querySelector('#color-reset').addEventListener('click', () => {
+    root.querySelector("#color-reset").addEventListener("click", () => {
       state = { ...DEFAULT_COLOR };
       write(STORAGE_KEY, state);
       paintAll();
-      announce('Laboratorio de color restablecido');
+      announce("Laboratorio de color restablecido");
     });
 
     paintAll();

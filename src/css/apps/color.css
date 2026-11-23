@@ -76,16 +76,21 @@
   aspect-ratio: 1;
   border-radius: 50%;
   background:
-    radial-gradient(circle closest-side, #ffffff 0%, rgb(255 255 255 / 72%) 26%, rgb(255 255 255 / 0%) 72%),
+    radial-gradient(
+      circle closest-side,
+      #fff 0%,
+      rgb(255 255 255 / 72%) 26%,
+      rgb(255 255 255 / 0%) 72%
+    ),
     conic-gradient(
       from 90deg,
-      #ff0000,
-      #ffff00 16.666%,
-      #00ff00 33.333%,
-      #00ffff 50%,
-      #0000ff 66.666%,
-      #ff00ff 83.333%,
-      #ff0000
+      #f00,
+      #ff0 16.666%,
+      #0f0 33.333%,
+      #0ff 50%,
+      #00f 66.666%,
+      #f0f 83.333%,
+      #f00
     );
   box-shadow:
     inset 0 0 0 1px rgb(0 0 0 / 25%),
@@ -100,8 +105,8 @@
   left: 50%;
   width: 1.15rem;
   height: 1.15rem;
-  background: var(--wheel-color, #ffffff);
-  border: 2px solid #ffffff;
+  background: var(--wheel-color, #fff);
+  border: 2px solid #fff;
   border-radius: 50%;
   box-shadow:
     0 0 0 1px rgb(0 0 0 / 45%),
@@ -200,7 +205,9 @@
   border: 1px solid rgb(0 0 0 / 16%);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: transform var(--transition), box-shadow var(--transition);
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition);
 
   &:hover {
     transform: translateY(-2px);
@@ -254,7 +261,9 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: border-color var(--transition), background var(--transition);
+  transition:
+    border-color var(--transition),
+    background var(--transition);
 
   &:hover {
     border-color: var(--accent);
@@ -302,14 +311,14 @@
   white-space: nowrap;
 }
 
-.color__token-badge[data-level='aaa'],
-.color__token-badge[data-level='aa'] {
+.color__token-badge[data-level="aaa"],
+.color__token-badge[data-level="aa"] {
   color: var(--success);
   border-color: color-mix(in srgb, var(--success) 45%, transparent);
   background: color-mix(in srgb, var(--success) 10%, var(--surface));
 }
 
-.color__token-badge[data-level='fail'] {
+.color__token-badge[data-level="fail"] {
   color: var(--danger);
   border-color: color-mix(in srgb, var(--danger) 45%, transparent);
   background: color-mix(in srgb, var(--danger) 10%, var(--surface));
@@ -436,7 +445,7 @@
   width: 100%;
 }
 
-@media (max-width: 60rem) {
+@media (width <= 60rem) {
   .color__layout {
     grid-template-columns: 1fr;
   }
@@ -446,7 +455,7 @@
   }
 }
 
-@media (max-width: 47.99rem) {
+@media (width <= 47.99rem) {
   .color__wheel {
     --wheel-size: min(16rem, 70vw);
   }

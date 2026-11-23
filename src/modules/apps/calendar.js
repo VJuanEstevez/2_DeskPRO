@@ -1,6 +1,6 @@
-import '../../css/apps/calendar.css';
+import "../../css/apps/calendar.css";
 
-import { read, write, subscribe, announce } from '../store.js';
+import { read, write, subscribe, announce } from "../store.js";
 import {
   icon,
   escapeHtml,
@@ -11,12 +11,16 @@ import {
   clearableInput,
   showTooltip,
   hideTooltip,
-} from '../ui.js';
+} from "../ui.js";
 
-const STORAGE_KEY = 'calendar';
-const WEEKDAYS = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'];
-const MONTHS_LONG = new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' });
-const DAY_LABEL = new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+const STORAGE_KEY = "calendar";
+const WEEKDAYS = ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"];
+const MONTHS_LONG = new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" });
+const DAY_LABEL = new Intl.DateTimeFormat("es-ES", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+});
 
 /**
  * @typedef {{id: string, title: string, time: string}} CalendarEvent
@@ -30,7 +34,7 @@ let selectedDate = toIsoDate(new Date());
  */
 function getStore() {
   const stored = read(STORAGE_KEY, {});
-  return stored && typeof stored === 'object' ? stored : {};
+  return stored && typeof stored === "object" ? stored : {};
 }
 
 /**
@@ -53,7 +57,7 @@ function getEvents(isoDate) {
  * @param {string} isoDate
  */
 function renderPanel() {
-  const panel = document.getElementById('calendar-panel');
+  const panel = document.getElementById("calendar-panel");
   if (!panel) return;
 
   const date = parseIsoDate(selectedDate);
@@ -72,67 +76,70 @@ function renderPanel() {
       <div class="field event-form__row">
         <label class="field__label" for="event-time">Hora</label>
         <input class="field__control" id="event-time" name="time" type="time" />
-        <button class="button button--primary" type="submit">${icon('icon-plus')}<span>Añadir</span></button>
+        <button class="button button--primary" type="submit">${icon("icon-plus")}<span>Añadir</span></button>
       </div>
     </form>
 
     ${
       events.length === 0
-        ? `<p class="empty-state empty-state--compact">${icon('icon-calendar', { size: 22 })}<span>Sin eventos este día.</span></p>`
+        ? `<p class="empty-state empty-state--compact">${icon("icon-calendar", { size: 22 })}<span>Sin eventos este día.</span></p>`
         : `<ul class="event-list">
             ${events
               .map(
                 (event) => `
               <li class="event-list__item" data-id="${event.id}">
-                <span class="event-list__time">${event.time ? escapeHtml(event.time) : 'Todo el día'}</span>
+                <span class="event-list__time">${event.time ? escapeHtml(event.time) : "Todo el día"}</span>
                 <span class="event-list__title">${escapeHtml(event.title)}</span>
                 <button class="icon-button icon-button--small" type="button" aria-label="Eliminar evento ${escapeHtml(event.title)}">
-                  ${icon('icon-trash', { size: 16 })}
+                  ${icon("icon-trash", { size: 16 })}
                 </button>
               </li>`
               )
-              .join('')}
+              .join("")}
           </ul>`
     }`;
 
-  const form = panel.querySelector('#event-form');
-  form.addEventListener('submit', (event) => {
+  const form = panel.querySelector("#event-form");
+  form.addEventListener("submit", (event) => {
     event.preventDefault();
     const data = new FormData(form);
-    const title = String(data.get('title') || '').trim();
+    const title = String(data.get("title") || "").trim();
     if (!title) return;
 
     const store = getStore();
     const list = Array.isArray(store[selectedDate]) ? store[selectedDate] : [];
-    store[selectedDate] = [...list, { id: uid(), title, time: String(data.get('time') || '') }].sort((a, b) =>
-      (a.time || '99:99').localeCompare(b.time || '99:99')
-    );
+    store[selectedDate] = [
+      ...list,
+      { id: uid(), title, time: String(data.get("time") || "") },
+    ].sort((a, b) => (a.time || "99:99").localeCompare(b.time || "99:99"));
     saveStore(store);
-    announce('Evento añadido');
+    announce("Evento añadido");
 
     // The panel is rebuilt on every change, so keep the keyboard where it was.
-    const titleInput = panel.querySelector('#event-title');
+    const titleInput = panel.querySelector("#event-title");
     if (titleInput) titleInput.focus();
   });
 
-  panel.querySelectorAll('.event-list__item').forEach((item) => {
-    const button = item.querySelector('button');
+  panel.querySelectorAll(".event-list__item").forEach((item) => {
+    const button = item.querySelector("button");
     armAction(button, {
-      label: button.getAttribute('aria-label'),
-      confirmLabel: 'Confirmar eliminación',
+      label: button.getAttribute("aria-label"),
+      confirmLabel: "Confirmar eliminación",
       onConfirm: () => {
         const store = getStore();
-        store[selectedDate] = (store[selectedDate] || []).filter((event) => event.id !== item.dataset.id);
+        store[selectedDate] = (store[selectedDate] || []).filter(
+          (event) => event.id !== item.dataset.id
+        );
         saveStore(store);
-        announce('Evento eliminado');
+        announce("Evento eliminado");
       },
     });
   });
 }
 
 function renderGrid() {
-  const table = document.getElementById('calendar-table');
-  const title = document.getElementById('calendar-month');
+  const table = document.getElementById("calendar-table");
+  const title = document.getElementById("calendar-month");
   if (!table || !title) return;
 
   // The grid is rebuilt on selection/month changes, so drop the old anchor.
@@ -149,7 +156,8 @@ function renderGrid() {
   const today = toIsoDate(new Date());
 
   const cells = [];
-  for (let index = 0; index < offset; index += 1) cells.push('<td class="calendar__cell calendar__cell--outside"></td>');
+  for (let index = 0; index < offset; index += 1)
+    cells.push('<td class="calendar__cell calendar__cell--outside"></td>');
 
   for (let day = 1; day <= daysInMonth; day += 1) {
     const isoDate = toIsoDate(new Date(year, month, day));
@@ -158,50 +166,53 @@ function renderGrid() {
     const isToday = isoDate === today;
     const accessibleDay = capitalize(DAY_LABEL.format(parseIsoDate(isoDate)));
     const eventsText = events
-      .map((event) => `${event.time ? `${event.time} · ` : ''}${event.title}`)
-      .join(' | ');
+      .map((event) => `${event.time ? `${event.time} · ` : ""}${event.title}`)
+      .join(" | ");
     const ariaLabel = `${accessibleDay}${
-      events.length > 0 ? `, ${events.length} evento${events.length === 1 ? '' : 's'}: ${eventsText}` : ''
+      events.length > 0
+        ? `, ${events.length} evento${events.length === 1 ? "" : "s"}: ${eventsText}`
+        : ""
     }`;
 
     cells.push(`
-      <td class="calendar__cell${isSelected ? ' is-selected' : ''}${isToday ? ' is-today' : ''}">
+      <td class="calendar__cell${isSelected ? " is-selected" : ""}${isToday ? " is-today" : ""}">
         <button
           class="calendar__day"
           type="button"
           data-date="${isoDate}"
-          ${events.length > 0 ? `data-events="${escapeHtml(eventsText)}"` : ''}
-          tabindex="${isSelected ? '0' : '-1'}"
+          ${events.length > 0 ? `data-events="${escapeHtml(eventsText)}"` : ""}
+          tabindex="${isSelected ? "0" : "-1"}"
           aria-label="${escapeHtml(ariaLabel)}"
         >
           <span class="calendar__day-number">${day}</span>
-          ${events.length > 0 ? `<span class="calendar__badge">${events.length}</span>` : ''}
+          ${events.length > 0 ? `<span class="calendar__badge">${events.length}</span>` : ""}
         </button>
       </td>`);
   }
 
-  while (cells.length % 7 !== 0) cells.push('<td class="calendar__cell calendar__cell--outside"></td>');
+  while (cells.length % 7 !== 0)
+    cells.push('<td class="calendar__cell calendar__cell--outside"></td>');
 
   const rows = [];
   for (let index = 0; index < cells.length; index += 7) {
-    rows.push(`<tr>${cells.slice(index, index + 7).join('')}</tr>`);
+    rows.push(`<tr>${cells.slice(index, index + 7).join("")}</tr>`);
   }
 
-  table.querySelector('tbody').innerHTML = rows.join('');
+  table.querySelector("tbody").innerHTML = rows.join("");
 
   // Event text is available on hover, keyboard focus and touch on every viewport.
-  table.querySelectorAll('[data-events]').forEach((button) => {
+  table.querySelectorAll("[data-events]").forEach((button) => {
     const show = () => showTooltip(button.dataset.events, button);
-    button.addEventListener('pointerenter', show);
-    button.addEventListener('focus', show);
-    button.addEventListener('click', show);
-    button.addEventListener('pointerleave', hideTooltip);
-    button.addEventListener('blur', hideTooltip);
+    button.addEventListener("pointerenter", show);
+    button.addEventListener("focus", show);
+    button.addEventListener("click", show);
+    button.addEventListener("pointerleave", hideTooltip);
+    button.addEventListener("blur", hideTooltip);
   });
 
   // Keep a single tab stop inside the grid even when the selection lives in another month.
   if (!table.querySelector('.calendar__day[tabindex="0"]')) {
-    const firstDayButton = table.querySelector('.calendar__day');
+    const firstDayButton = table.querySelector(".calendar__day");
     if (firstDayButton) firstDayButton.tabIndex = 0;
   }
 }
@@ -224,7 +235,7 @@ function selectDate(isoDate) {
 }
 
 export default {
-  meta: { title: 'Calendario' },
+  meta: { title: "Calendario" },
   render(root) {
     root.innerHTML = `
       <section class="app app--calendar">
@@ -241,18 +252,18 @@ export default {
           <div class="calendar__main">
             <div class="calendar__month-nav">
               <button class="icon-button" id="calendar-prev" type="button" aria-label="Mes anterior">
-                ${icon('icon-chevron-left')}
+                ${icon("icon-chevron-left")}
               </button>
               <h2 class="calendar__month" id="calendar-month"></h2>
               <button class="icon-button" id="calendar-next" type="button" aria-label="Mes siguiente">
-                ${icon('icon-chevron-right')}
+                ${icon("icon-chevron-right")}
               </button>
             </div>
             <table class="calendar__table" id="calendar-table">
               <caption class="sr-only">Vista mensual del calendario</caption>
               <thead>
                 <tr>
-                  ${WEEKDAYS.map((day) => `<th scope="col">${day}</th>`).join('')}
+                  ${WEEKDAYS.map((day) => `<th scope="col">${day}</th>`).join("")}
                 </tr>
               </thead>
               <tbody></tbody>
@@ -262,30 +273,30 @@ export default {
         </div>
       </section>`;
 
-    const table = root.querySelector('#calendar-table');
+    const table = root.querySelector("#calendar-table");
 
-    root.querySelector('#calendar-prev').addEventListener('click', () => {
+    root.querySelector("#calendar-prev").addEventListener("click", () => {
       viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1);
       renderGrid();
     });
 
-    root.querySelector('#calendar-next').addEventListener('click', () => {
+    root.querySelector("#calendar-next").addEventListener("click", () => {
       viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1);
       renderGrid();
     });
 
-    root.querySelector('#calendar-today').addEventListener('click', () => {
+    root.querySelector("#calendar-today").addEventListener("click", () => {
       selectDate(toIsoDate(new Date()));
     });
 
-    table.addEventListener('click', (event) => {
-      const button = event.target.closest('.calendar__day');
+    table.addEventListener("click", (event) => {
+      const button = event.target.closest(".calendar__day");
       if (!button) return;
       selectDate(button.dataset.date);
     });
 
-    table.addEventListener('keydown', (event) => {
-      const button = event.target.closest('.calendar__day');
+    table.addEventListener("keydown", (event) => {
+      const button = event.target.closest(".calendar__day");
       if (!button) return;
 
       const deltas = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
@@ -295,11 +306,11 @@ export default {
         const date = parseIsoDate(button.dataset.date);
         date.setDate(date.getDate() + deltas[event.key]);
         nextDate = toIsoDate(date);
-      } else if (event.key === 'Home') {
+      } else if (event.key === "Home") {
         const date = parseIsoDate(button.dataset.date);
         date.setDate(date.getDate() - ((date.getDay() + 6) % 7));
         nextDate = toIsoDate(date);
-      } else if (event.key === 'End') {
+      } else if (event.key === "End") {
         const date = parseIsoDate(button.dataset.date);
         date.setDate(date.getDate() + (6 - ((date.getDay() + 6) % 7)));
         nextDate = toIsoDate(date);

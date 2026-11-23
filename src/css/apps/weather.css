@@ -314,7 +314,9 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   cursor: pointer;
-  transition: border-color var(--transition), transform var(--transition);
+  transition:
+    border-color var(--transition),
+    transform var(--transition);
 
   &:hover {
     border-color: var(--accent);
@@ -344,7 +346,7 @@
   color: var(--text-muted);
 }
 
-@media (max-width: 60rem) {
+@media (width <= 60rem) {
   .weather__hero {
     grid-template-columns: 1fr;
   }

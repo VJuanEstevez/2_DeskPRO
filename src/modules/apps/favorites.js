@@ -1,9 +1,9 @@
-import '../../css/apps/favorites.css';
+import "../../css/apps/favorites.css";
 
-import { read, write, subscribe, announce } from '../store.js';
-import { icon, escapeHtml, uid, armAction, clearableInput, FALLBACK_LOGO } from '../ui.js';
+import { read, write, subscribe, announce } from "../store.js";
+import { icon, escapeHtml, uid, armAction, clearableInput, FALLBACK_LOGO } from "../ui.js";
 
-const STORAGE_KEY = 'favorites';
+const STORAGE_KEY = "favorites";
 
 /**
  * @typedef {{id: string, name: string, url: string, host: string, createdAt: number}} Favorite
@@ -29,31 +29,31 @@ function saveFavorites(favorites) {
  * @returns {{url: string, host: string}|null}
  */
 function normalizeUrl(value) {
-  const raw = String(value || '').trim();
+  const raw = String(value || "").trim();
   if (!raw) return null;
 
   let url;
   try {
-    url = new URL(raw.includes('://') ? raw : `https://${raw}`);
-  } catch (error) {
+    url = new URL(raw.includes("://") ? raw : `https://${raw}`);
+  } catch {
     return null;
   }
 
-  if (!['http:', 'https:'].includes(url.protocol) || !url.hostname.includes('.')) return null;
-  return { url: url.href, host: url.hostname.replace(/^www\./, '') };
+  if (!["http:", "https:"].includes(url.protocol) || !url.hostname.includes(".")) return null;
+  return { url: url.href, host: url.hostname.replace(/^www\./, "") };
 }
 
 function render() {
-  const list = document.getElementById('favorites-list');
-  const count = document.getElementById('favorites-count');
+  const list = document.getElementById("favorites-list");
+  const count = document.getElementById("favorites-count");
   if (!list || !count) return;
 
   const favorites = getFavorites();
-  count.textContent = `${favorites.length} enlace${favorites.length === 1 ? '' : 's'}`;
+  count.textContent = `${favorites.length} enlace${favorites.length === 1 ? "" : "s"}`;
 
   if (favorites.length === 0) {
     list.innerHTML = `<li class="empty-state">
-      ${icon('icon-star', { size: 28, className: 'empty-state__icon' })}
+      ${icon("icon-star", { size: 28, className: "empty-state__icon" })}
       <p class="empty-state__title">Sin favoritos</p>
       <p class="empty-state__text">Guarda tu primer enlace con el formulario de arriba.</p>
     </li>`;
@@ -78,36 +78,36 @@ function render() {
             ${
               favorite.name && favorite.name !== favorite.host
                 ? `<span class="favorite__name">${escapeHtml(favorite.name)}</span>`
-                : ''
+                : ""
             }
             <span class="favorite__host">${escapeHtml(favorite.host)}</span>
           </span>
-          ${icon('icon-external', { size: 16, className: 'favorite__external' })}
+          ${icon("icon-external", { size: 16, className: "favorite__external" })}
         </a>
         <button class="icon-button icon-button--small favorite__remove" type="button" aria-label="Eliminar favorito ${escapeHtml(
           favorite.name
         )}">
-          ${icon('icon-trash', { size: 16 })}
+          ${icon("icon-trash", { size: 16 })}
         </button>
       </li>`
     )
-    .join('');
+    .join("");
 
-  list.querySelectorAll('.favorite__remove').forEach((button) => {
-    const id = button.closest('.favorite').dataset.id;
+  list.querySelectorAll(".favorite__remove").forEach((button) => {
+    const id = button.closest(".favorite").dataset.id;
     armAction(button, {
-      label: button.getAttribute('aria-label'),
-      confirmLabel: 'Confirmar eliminación',
+      label: button.getAttribute("aria-label"),
+      confirmLabel: "Confirmar eliminación",
       onConfirm: () => {
         saveFavorites(getFavorites().filter((favorite) => favorite.id !== id));
-        announce('Favorito eliminado');
+        announce("Favorito eliminado");
       },
     });
   });
 }
 
 export default {
-  meta: { title: 'Favoritos' },
+  meta: { title: "Favoritos" },
   render(root) {
     root.innerHTML = `
       <section class="app app--favorites">
@@ -125,30 +125,30 @@ export default {
               '<input class="field__control" id="favorite-url" name="url" type="text" inputmode="url" placeholder="https://ejemplo.com" autocomplete="off" required />'
             )}
           </div>
-          <button class="button button--primary" type="submit">${icon('icon-plus')}<span>Guardar</span></button>
+          <button class="button button--primary" type="submit">${icon("icon-plus")}<span>Guardar</span></button>
         </form>
 
         <ul class="favorites__grid" id="favorites-list"></ul>
       </section>`;
 
-    const form = root.querySelector('#favorites-form');
-    const listNode = root.querySelector('#favorites-list');
+    const form = root.querySelector("#favorites-form");
+    const listNode = root.querySelector("#favorites-list");
 
     render();
 
-    form.addEventListener('submit', (event) => {
+    form.addEventListener("submit", (event) => {
       event.preventDefault();
       const data = new FormData(form);
-      const normalized = normalizeUrl(String(data.get('url') || ''));
+      const normalized = normalizeUrl(String(data.get("url") || ""));
 
       if (!normalized) {
-        announce('Esa URL no parece válida. Incluye un dominio, por ejemplo https://ejemplo.com');
+        announce("Esa URL no parece válida. Incluye un dominio, por ejemplo https://ejemplo.com");
         return;
       }
 
       const favorites = getFavorites();
       if (favorites.some((favorite) => favorite.url === normalized.url)) {
-        announce('Ese enlace ya está guardado.');
+        announce("Ese enlace ya está guardado.");
         return;
       }
 
@@ -161,16 +161,16 @@ export default {
       });
       saveFavorites(favorites);
       form.reset();
-      announce('Favorito guardado');
+      announce("Favorito guardado");
     });
 
     // Logos are decorative: a broken image silently falls back to a generic link mark.
     listNode.addEventListener(
-      'error',
+      "error",
       (event) => {
         const image = event.target;
         if (!(image instanceof HTMLImageElement) || image.dataset.fallbackUsed) return;
-        image.dataset.fallbackUsed = 'true';
+        image.dataset.fallbackUsed = "true";
         image.src = image.dataset.fallback;
       },
       true

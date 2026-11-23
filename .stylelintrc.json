@@ -1,0 +1,19 @@
+{
+  "extends": ["stylelint-config-standard"],
+  "ignoreFiles": [
+    "src/dist/**",
+    "dist/**",
+    "build/**",
+    "node_modules/**"
+  ],
+  "rules": {
+    "selector-class-pattern": null,
+    "custom-property-pattern": null,
+    "color-function-notation": null,
+    "alpha-value-notation": null,
+    "media-feature-range-notation": null,
+    "no-descending-specificity": null,
+    "declaration-block-no-redundant-longhand-properties": null,
+    "shorthand-property-no-redundant-values": null
+  }
+}

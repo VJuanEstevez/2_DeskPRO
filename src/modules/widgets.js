@@ -1,4 +1,4 @@
-import { read, write, subscribe, announce } from './store.js';
+import { read, write, subscribe, announce } from "./store.js";
 import {
   icon,
   escapeHtml,
@@ -12,7 +12,7 @@ import {
   showTooltip,
   hideTooltip,
   FALLBACK_LOGO,
-} from './ui.js';
+} from "./ui.js";
 import {
   getPomodoroState,
   subscribePomodoro,
@@ -21,29 +21,35 @@ import {
   resetPomodoro,
   stopAlarm,
   PHASES,
-} from './apps/pomodoro.js';
-import { getLocation } from './location.js';
-import { fetchCurrent, describeWeatherCode } from './api/weather.js';
-import { loadYouTubeApi } from './api/youtube.js';
-import { CHARACTER_SETS, generate, strengthFor } from './apps/password.js';
-import { getColorState, buildHarmony, buildNeutrals, findHarmony, HARMONIES } from './apps/color.js';
-import { getTextState } from './apps/textgen.js';
+} from "./apps/pomodoro.js";
+import { getLocation } from "./location.js";
+import { fetchCurrent, describeWeatherCode } from "./api/weather.js";
+import { loadYouTubeApi } from "./api/youtube.js";
+import { CHARACTER_SETS, generate, strengthFor } from "./apps/password.js";
+import {
+  getColorState,
+  buildHarmony,
+  buildNeutrals,
+  findHarmony,
+  HARMONIES,
+} from "./apps/color.js";
+import { getTextState } from "./apps/textgen.js";
 import {
   DEFAULT_TYPOGRAPHY,
   HEADING_FONTS,
   findHeadingFont,
   findBodyFont,
   selectBodyFonts,
-} from './data/fonts.js';
-import { findTextTheme } from './data/text-themes.js';
+} from "./data/fonts.js";
+import { findTextTheme } from "./data/text-themes.js";
 
-const WEEKDAYS_SHORT = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'];
-const MONTH_LABEL = new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' });
+const WEEKDAYS_SHORT = ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"];
+const MONTH_LABEL = new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" });
 const RING_RADIUS = 54;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 const YT_PLAYING = 1;
-const TYPOGRAPHY_KEY = 'typography';
-const COLOR_KEY = 'color-studio';
+const TYPOGRAPHY_KEY = "typography";
+const COLOR_KEY = "color-studio";
 
 /**
  * Reads the typography setup used by the widget, repairing missing values and
@@ -51,7 +57,7 @@ const COLOR_KEY = 'color-studio';
  */
 function readTypographyState() {
   const stored = read(TYPOGRAPHY_KEY, {});
-  const source = stored && typeof stored === 'object' ? stored : {};
+  const source = stored && typeof stored === "object" ? stored : {};
   const heading = findHeadingFont(source.headingFont);
   const bodyOptions = selectBodyFonts(heading.id);
   const body = bodyOptions.find((font) => font.id === source.bodyFont) || bodyOptions[0];
@@ -74,9 +80,9 @@ function bodyFontOptions(headingId, selectedId) {
   return selectBodyFonts(headingId)
     .map(
       (font) =>
-        `<option value="${font.id}" ${font.id === selectedId ? 'selected' : ''}>${escapeHtml(font.label)}</option>`
+        `<option value="${font.id}" ${font.id === selectedId ? "selected" : ""}>${escapeHtml(font.label)}</option>`
     )
-    .join('');
+    .join("");
 }
 
 /**
@@ -130,8 +136,8 @@ export const WIDGETS = {
       const today = new Date();
       const year = viewDate.getFullYear();
       const month = viewDate.getMonth();
-      const stored = read('calendar', {});
-      const eventsByDay = stored && typeof stored === 'object' ? stored : {};
+      const stored = read("calendar", {});
+      const eventsByDay = stored && typeof stored === "object" ? stored : {};
 
       const firstDay = new Date(year, month, 1);
       const offset = (firstDay.getDay() + 6) % 7;
@@ -140,7 +146,9 @@ export const WIDGETS = {
 
       const cells = [];
       for (let index = 0; index < offset; index += 1) {
-        cells.push('<li class="widget-calendar__day widget-calendar__day--outside" aria-hidden="true"></li>');
+        cells.push(
+          '<li class="widget-calendar__day widget-calendar__day--outside" aria-hidden="true"></li>'
+        );
       }
 
       let eventCount = 0;
@@ -152,13 +160,13 @@ export const WIDGETS = {
         eventCount += events.length;
         if (events.length > 0) markedDays += 1;
 
-        const classes = ['widget-calendar__day'];
-        if (isoDate === todayIso) classes.push('is-today');
-        if (events.length > 0) classes.push('has-events');
+        const classes = ["widget-calendar__day"];
+        if (isoDate === todayIso) classes.push("is-today");
+        if (events.length > 0) classes.push("has-events");
 
         const tooltipText = events
-          .map((event) => `${event.time ? `${event.time} · ` : ''}${event.title}`)
-          .join(' | ');
+          .map((event) => `${event.time ? `${event.time} · ` : ""}${event.title}`)
+          .join(" | ");
         const label = `${day} de ${capitalize(MONTH_LABEL.format(viewDate))}: ${tooltipText}`;
         const body =
           events.length > 0
@@ -167,54 +175,54 @@ export const WIDGETS = {
               )}" aria-label="${escapeHtml(label)}">${day}</button>`
             : String(day);
 
-        cells.push(`<li class="${classes.join(' ')}">${body}</li>`);
+        cells.push(`<li class="${classes.join(" ")}">${body}</li>`);
       }
 
       const summary =
         eventCount === 0
-          ? 'Sin citas este mes'
-          : `${eventCount} cita${eventCount === 1 ? '' : 's'} en ${markedDays} día${markedDays === 1 ? '' : 's'}`;
+          ? "Sin citas este mes"
+          : `${eventCount} cita${eventCount === 1 ? "" : "s"} en ${markedDays} día${markedDays === 1 ? "" : "s"}`;
 
       node.innerHTML = `
         <div class="widget-calendar">
           <div class="widget-calendar__head">
             <button class="icon-button icon-button--small" type="button" data-month-prev aria-label="Mes anterior">
-              ${icon('icon-chevron-left', { size: 16 })}
+              ${icon("icon-chevron-left", { size: 16 })}
             </button>
             <p class="widget-calendar__month">${escapeHtml(capitalize(MONTH_LABEL.format(viewDate)))}</p>
             <button class="icon-button icon-button--small" type="button" data-month-next aria-label="Mes siguiente">
-              ${icon('icon-chevron-right', { size: 16 })}
+              ${icon("icon-chevron-right", { size: 16 })}
             </button>
           </div>
           <ol class="widget-calendar__weekdays" aria-hidden="true">
-            ${WEEKDAYS_SHORT.map((day) => `<li>${day}</li>`).join('')}
+            ${WEEKDAYS_SHORT.map((day) => `<li>${day}</li>`).join("")}
           </ol>
-          <ol class="widget-calendar__grid">${cells.join('')}</ol>
+          <ol class="widget-calendar__grid">${cells.join("")}</ol>
           <p class="widget-calendar__summary">${escapeHtml(summary)}</p>
         </div>`;
 
-      node.querySelector('[data-month-prev]').addEventListener('click', () => {
+      node.querySelector("[data-month-prev]").addEventListener("click", () => {
         viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1);
         paint();
       });
 
-      node.querySelector('[data-month-next]').addEventListener('click', () => {
+      node.querySelector("[data-month-next]").addEventListener("click", () => {
         viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1);
         paint();
       });
 
-      node.querySelectorAll('[data-events]').forEach((button) => {
+      node.querySelectorAll("[data-events]").forEach((button) => {
         const show = () => showTooltip(button.dataset.events, button);
-        button.addEventListener('pointerenter', show);
-        button.addEventListener('focus', show);
-        button.addEventListener('click', show);
-        button.addEventListener('pointerleave', hideTooltip);
-        button.addEventListener('blur', hideTooltip);
+        button.addEventListener("pointerenter", show);
+        button.addEventListener("focus", show);
+        button.addEventListener("click", show);
+        button.addEventListener("pointerleave", hideTooltip);
+        button.addEventListener("blur", hideTooltip);
       });
     };
 
     paint();
-    return subscribe('calendar', paint);
+    return subscribe("calendar", paint);
   },
 
   pomodoro(node) {
@@ -240,22 +248,22 @@ export const WIDGETS = {
         </div>
         <div class="widget-pomodoro__actions">
           <button class="button button--primary" type="button" data-toggle>
-            ${icon('icon-play', { size: 16 })}<span>Iniciar</span>
+            ${icon("icon-play", { size: 16 })}<span>Iniciar</span>
           </button>
           <button class="button button--ghost" type="button" data-reset>
-            ${icon('icon-refresh', { size: 16 })}<span>Reiniciar</span>
+            ${icon("icon-refresh", { size: 16 })}<span>Reiniciar</span>
           </button>
           <button class="button button--ghost widget-pomodoro__alarm" type="button" data-stop-alarm hidden>
-            ${icon('icon-stop', { size: 16 })}<span>Detener alarma</span>
+            ${icon("icon-stop", { size: 16 })}<span>Detener alarma</span>
           </button>
         </div>
       </div>`;
 
-    const ring = node.querySelector('[data-ring]');
-    const timeNode = node.querySelector('[data-time]');
-    const phaseNode = node.querySelector('[data-phase]');
-    const toggle = node.querySelector('[data-toggle]');
-    const alarmButton = node.querySelector('[data-stop-alarm]');
+    const ring = node.querySelector("[data-ring]");
+    const timeNode = node.querySelector("[data-time]");
+    const phaseNode = node.querySelector("[data-phase]");
+    const toggle = node.querySelector("[data-toggle]");
+    const alarmButton = node.querySelector("[data-stop-alarm]");
 
     const paint = (snapshot) => {
       const state = snapshot || getPomodoroState();
@@ -271,26 +279,26 @@ export const WIDGETS = {
 
       if (toggle.dataset.running !== String(state.running)) {
         toggle.dataset.running = String(state.running);
-        const label = state.running ? 'Pausar' : 'Iniciar';
-        toggle.innerHTML = `${state.running ? icon('icon-pause', { size: 16 }) : icon('icon-play', { size: 16 })}<span>${label}</span>`;
+        const label = state.running ? "Pausar" : "Iniciar";
+        toggle.innerHTML = `${state.running ? icon("icon-pause", { size: 16 }) : icon("icon-play", { size: 16 })}<span>${label}</span>`;
       }
 
       alarmButton.hidden = !state.alarm;
     };
 
-    toggle.addEventListener('click', () => {
+    toggle.addEventListener("click", () => {
       if (getPomodoroState().running) pausePomodoro();
       else startPomodoro();
     });
 
-    node.querySelector('[data-reset]').addEventListener('click', () => {
+    node.querySelector("[data-reset]").addEventListener("click", () => {
       resetPomodoro();
-      announce('Temporizador reiniciado');
+      announce("Temporizador reiniciado");
     });
 
-    alarmButton.addEventListener('click', () => {
+    alarmButton.addEventListener("click", () => {
       stopAlarm();
-      announce('Alarma detenida');
+      announce("Alarma detenida");
     });
 
     paint();
@@ -305,15 +313,18 @@ export const WIDGETS = {
       .then((place) => {
         if (cancelled) return;
         if (place.latitude === null || !Number.isFinite(place.latitude)) {
-          node.innerHTML = '<p class="widget-status">Sin ubicación. Activa la ubicación o elige una ciudad.</p>';
+          node.innerHTML =
+            '<p class="widget-status">Sin ubicación. Activa la ubicación o elige una ciudad.</p>';
           return null;
         }
 
         return fetchCurrent(place.latitude, place.longitude).then((current) => {
           if (cancelled) return;
           const info = describeWeatherCode(current.weatherCode);
-          const iconName = info.icon === 'wmo-clear' && !current.isDay ? 'icon-moon' : info.icon;
-          const temperature = Number.isFinite(current.temperature) ? `${Math.round(current.temperature)}°` : '—';
+          const iconName = info.icon === "wmo-clear" && !current.isDay ? "icon-moon" : info.icon;
+          const temperature = Number.isFinite(current.temperature)
+            ? `${Math.round(current.temperature)}°`
+            : "—";
 
           node.innerHTML = `
             <div class="widget-weather">
@@ -329,7 +340,8 @@ export const WIDGETS = {
         });
       })
       .catch(() => {
-        if (!cancelled) node.innerHTML = '<p class="widget-status">No se pudo cargar el tiempo.</p>';
+        if (!cancelled)
+          node.innerHTML = '<p class="widget-status">No se pudo cargar el tiempo.</p>';
       });
 
     return () => {
@@ -359,16 +371,16 @@ export const WIDGETS = {
           autocomplete="off"
           required
         />`)}
-        <button class="button button--primary" type="submit">${icon('icon-plus', { size: 16 })}<span>Añadir</span></button>
+        <button class="button button--primary" type="submit">${icon("icon-plus", { size: 16 })}<span>Añadir</span></button>
       </form>
       <ul class="widget-list" data-todo-list></ul>`;
 
-    const form = node.querySelector('[data-todo-form]');
-    const input = node.querySelector('#widget-todo-input');
-    const list = node.querySelector('[data-todo-list]');
+    const form = node.querySelector("[data-todo-form]");
+    const input = node.querySelector("#widget-todo-input");
+    const list = node.querySelector("[data-todo-list]");
 
     const readItems = () => {
-      const stored = read('todo', []);
+      const stored = read("todo", []);
       return Array.isArray(stored) ? stored : [];
     };
 
@@ -383,7 +395,7 @@ export const WIDGETS = {
 
       selfWrite = true;
       write(
-        'todo',
+        "todo",
         items.map((entry) => (entry.id === id ? { ...entry, text: value } : entry))
       );
       selfWrite = false;
@@ -412,7 +424,8 @@ export const WIDGETS = {
           ? { id: active.dataset.edit, start: active.selectionStart, end: active.selectionEnd }
           : null;
       const focusWasInList = list.contains(active);
-      const focusedId = active instanceof HTMLInputElement && active.dataset.id ? active.dataset.id : null;
+      const focusedId =
+        active instanceof HTMLInputElement && active.dataset.id ? active.dataset.id : null;
 
       const pending = readItems().filter((item) => !item.done);
 
@@ -427,11 +440,13 @@ export const WIDGETS = {
         .map((item) => {
           const body =
             item.id === editingId
-              ? clearableInput(`<input class="widget-list__edit" data-edit="${escapeHtml(
-                  item.id
-                )}" type="text" maxlength="140" value="${escapeHtml(item.text)}" aria-label="Editar tarea ${escapeHtml(
-                  item.text
-                )}" />`)
+              ? clearableInput(
+                  `<input class="widget-list__edit" data-edit="${escapeHtml(
+                    item.id
+                  )}" type="text" maxlength="140" value="${escapeHtml(item.text)}" aria-label="Editar tarea ${escapeHtml(
+                    item.text
+                  )}" />`
+                )
               : `<label class="widget-list__label">
                   <input type="checkbox" data-id="${escapeHtml(item.id)}" />
                   <span>${escapeHtml(item.text)}</span>
@@ -444,31 +459,34 @@ export const WIDGETS = {
                 <button class="icon-button icon-button--small" type="button" data-edit-action="${escapeHtml(
                   item.id
                 )}" aria-label="Editar ${escapeHtml(item.text)}">
-                  ${icon('icon-edit', { size: 16 })}
+                  ${icon("icon-edit", { size: 16 })}
                 </button>
                 <button class="icon-button icon-button--small" type="button" data-delete="${escapeHtml(
                   item.id
                 )}" aria-label="Eliminar ${escapeHtml(item.text)}">
-                  ${icon('icon-trash', { size: 16 })}
+                  ${icon("icon-trash", { size: 16 })}
                 </button>
               </span>
             </li>`;
         })
-        .join('');
+        .join("");
 
       // A stray click never deletes a task: the button must be pressed twice.
-      list.querySelectorAll('[data-delete]').forEach((button) => {
+      list.querySelectorAll("[data-delete]").forEach((button) => {
         armAction(button, {
-          label: button.getAttribute('aria-label'),
-          confirmLabel: 'Confirmar eliminación',
+          label: button.getAttribute("aria-label"),
+          confirmLabel: "Confirmar eliminación",
           onConfirm: () => {
             const id = button.dataset.delete;
             if (editingId === id) {
               editingId = null;
               editingOriginal = null;
             }
-            write('todo', readItems().filter((item) => item.id !== id));
-            announce('Tarea eliminada');
+            write(
+              "todo",
+              readItems().filter((item) => item.id !== id)
+            );
+            announce("Tarea eliminada");
           },
         });
       });
@@ -490,29 +508,31 @@ export const WIDGETS = {
       target.focus();
     };
 
-    form.addEventListener('submit', (event) => {
+    form.addEventListener("submit", (event) => {
       event.preventDefault();
       const text = input.value.trim();
       if (!text) return;
 
-      write('todo', [{ id: uid(), text, done: false, createdAt: Date.now() }, ...readItems()]);
-      input.value = '';
+      write("todo", [{ id: uid(), text, done: false, createdAt: Date.now() }, ...readItems()]);
+      input.value = "";
       input.focus();
-      announce('Tarea añadida');
+      announce("Tarea añadida");
     });
 
-    list.addEventListener('change', (event) => {
+    list.addEventListener("change", (event) => {
       const checkbox = event.target.closest('input[type="checkbox"]');
       if (!checkbox) return;
 
       write(
-        'todo',
-        readItems().map((item) => (item.id === checkbox.dataset.id ? { ...item, done: checkbox.checked } : item))
+        "todo",
+        readItems().map((item) =>
+          item.id === checkbox.dataset.id ? { ...item, done: checkbox.checked } : item
+        )
       );
     });
 
-    list.addEventListener('click', (event) => {
-      const button = event.target.closest('[data-edit-action]');
+    list.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-edit-action]");
       if (!button) return;
 
       const id = button.dataset.editAction;
@@ -532,8 +552,8 @@ export const WIDGETS = {
       }
     });
 
-    list.addEventListener('input', (event) => {
-      const field = event.target.closest('[data-edit]');
+    list.addEventListener("input", (event) => {
+      const field = event.target.closest("[data-edit]");
       if (!field) return;
 
       pendingEdit = { id: field.dataset.edit, text: field.value };
@@ -546,21 +566,21 @@ export const WIDGETS = {
       }, EDIT_DELAY);
     });
 
-    list.addEventListener('keydown', (event) => {
-      const field = event.target.closest('[data-edit]');
+    list.addEventListener("keydown", (event) => {
+      const field = event.target.closest("[data-edit]");
       if (!field) return;
 
-      if (event.key === 'Enter') {
+      if (event.key === "Enter") {
         event.preventDefault();
         commitPendingEdit();
         editingId = null;
         editingOriginal = null;
         paint();
-        announce('Tarea actualizada');
+        announce("Tarea actualizada");
         return;
       }
 
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         event.preventDefault();
         cancelPendingEdit();
         if (editingOriginal !== null) commitEdit(field.dataset.edit, editingOriginal);
@@ -570,8 +590,8 @@ export const WIDGETS = {
       }
     });
 
-    list.addEventListener('focusout', (event) => {
-      const field = event.target.closest('[data-edit]');
+    list.addEventListener("focusout", (event) => {
+      const field = event.target.closest("[data-edit]");
       if (!field) return;
       const id = field.dataset.edit;
 
@@ -581,7 +601,7 @@ export const WIDGETS = {
       // Keep edit mode while the pointer lands on a row action, otherwise the
       // re-render would destroy the button before its click reaches it.
       const next = event.relatedTarget;
-      if (next instanceof Element && next.matches('[data-edit-action], [data-delete]')) return;
+      if (next instanceof Element && next.matches("[data-edit-action], [data-delete]")) return;
 
       if (editingId === id) {
         editingId = null;
@@ -591,7 +611,7 @@ export const WIDGETS = {
     });
 
     paint();
-    const unsubscribe = subscribe('todo', paint);
+    const unsubscribe = subscribe("todo", paint);
 
     return () => {
       unsubscribe();
@@ -607,7 +627,7 @@ export const WIDGETS = {
     let pending = null;
 
     const readNotes = () => {
-      const stored = read('notebook', []);
+      const stored = read("notebook", []);
       return Array.isArray(stored) ? stored : [];
     };
 
@@ -622,8 +642,12 @@ export const WIDGETS = {
       pending = null;
       if (!current) return;
       write(
-        'notebook',
-        readNotes().map((note) => (note.id === current.id ? { ...note, body: current.body, updatedAt: current.updatedAt } : note))
+        "notebook",
+        readNotes().map((note) =>
+          note.id === current.id
+            ? { ...note, body: current.body, updatedAt: current.updatedAt }
+            : note
+        )
       );
     };
 
@@ -632,12 +656,12 @@ export const WIDGETS = {
       if (saveTimer !== null) window.clearTimeout(saveTimer);
       saveTimer = window.setTimeout(flushSave, SAVE_DELAY);
 
-      const meta = node.querySelector('[data-note-meta]');
-      if (meta) meta.textContent = 'Editada ahora mismo';
+      const meta = node.querySelector("[data-note-meta]");
+      if (meta) meta.textContent = "Editada ahora mismo";
     };
 
     const paintItems = (notes) => {
-      const list = node.querySelector('[data-note-list]');
+      const list = node.querySelector("[data-note-list]");
       if (!list) return;
 
       const items = notes
@@ -655,17 +679,17 @@ export const WIDGETS = {
           (note) => `
           <li class="widget-list__item">
             <button class="widget-list__button" type="button" data-note="${note.id}">
-              <span class="widget-list__title">${escapeHtml(note.title || 'Sin título')}</span>
+              <span class="widget-list__title">${escapeHtml(note.title || "Sin título")}</span>
               <span class="widget-list__meta">${escapeHtml(formatRelativeTime(note.updatedAt))}</span>
             </button>
           </li>`
         )
-        .join('');
+        .join("");
     };
 
     // The "new note" form survives every list repaint, so only its list rebuilds.
     const renderShell = (notes) => {
-      if (!node.querySelector('[data-note-list]')) {
+      if (!node.querySelector("[data-note-list]")) {
         node.innerHTML = `
           <form class="widget-form" data-note-form>
             <label class="sr-only" for="widget-note-input">Nueva nota</label>
@@ -680,7 +704,7 @@ export const WIDGETS = {
               autocomplete="off"
               required
             />`)}
-            <button class="button button--primary" type="submit">${icon('icon-plus', { size: 16 })}<span>Añadir</span></button>
+            <button class="button button--primary" type="submit">${icon("icon-plus", { size: 16 })}<span>Añadir</span></button>
           </form>
           <ul class="widget-list" data-note-list></ul>`;
       }
@@ -692,9 +716,9 @@ export const WIDGETS = {
       node.innerHTML = `
         <div class="widget-note" data-note-editor>
           <div class="widget-note__head">
-            <p class="widget-note__title">${escapeHtml(note.title || 'Sin título')}</p>
+            <p class="widget-note__title">${escapeHtml(note.title || "Sin título")}</p>
             <button class="icon-button icon-button--small" type="button" data-note-close aria-label="Cerrar nota">
-              ${icon('icon-close', { size: 16 })}
+              ${icon("icon-close", { size: 16 })}
             </button>
           </div>
           <label class="sr-only" for="widget-note-body">Contenido de la nota</label>
@@ -704,7 +728,7 @@ export const WIDGETS = {
           <p class="widget-note__meta" data-note-meta>Editada ${escapeHtml(formatRelativeTime(note.updatedAt))}</p>
         </div>`;
 
-      const body = node.querySelector('[data-note-body]');
+      const body = node.querySelector("[data-note-body]");
       body.focus();
       body.setSelectionRange(body.value.length, body.value.length);
     };
@@ -722,7 +746,7 @@ export const WIDGETS = {
         if (!note) {
           openId = null;
           renderedId = null;
-        } else if (renderedId === openId && node.querySelector('[data-note-body]')) {
+        } else if (renderedId === openId && node.querySelector("[data-note-body]")) {
           return; // Never rebuild while the note is open: it would steal the caret.
         } else {
           renderEditor(note);
@@ -732,28 +756,28 @@ export const WIDGETS = {
       renderShell(readNotes());
     };
 
-    node.addEventListener('submit', (event) => {
-      const form = event.target.closest('[data-note-form]');
+    node.addEventListener("submit", (event) => {
+      const form = event.target.closest("[data-note-form]");
       if (!form) return;
       event.preventDefault();
 
-      const input = form.querySelector('#widget-note-input');
+      const input = form.querySelector("#widget-note-input");
       const title = input.value.trim();
       if (!title) return;
 
-      write('notebook', [{ id: uid(), title, body: '', updatedAt: Date.now() }, ...readNotes()]);
-      input.value = '';
+      write("notebook", [{ id: uid(), title, body: "", updatedAt: Date.now() }, ...readNotes()]);
+      input.value = "";
       input.focus();
-      announce('Nota creada');
+      announce("Nota creada");
     });
 
-    node.addEventListener('click', (event) => {
-      if (event.target.closest('[data-note-close]')) {
+    node.addEventListener("click", (event) => {
+      if (event.target.closest("[data-note-close]")) {
         closeEditor();
         return;
       }
 
-      const item = event.target.closest('[data-note]');
+      const item = event.target.closest("[data-note]");
       if (!item) return;
 
       flushSave();
@@ -763,15 +787,15 @@ export const WIDGETS = {
       else openId = null;
     });
 
-    node.addEventListener('input', (event) => {
-      const body = event.target.closest('[data-note-body]');
+    node.addEventListener("input", (event) => {
+      const body = event.target.closest("[data-note-body]");
       if (!body || !openId) return;
       const note = findNote(openId);
       if (note) scheduleSave(note, body.value);
     });
 
     paint();
-    const unsubscribe = subscribe('notebook', paint);
+    const unsubscribe = subscribe("notebook", paint);
 
     return () => {
       unsubscribe();
@@ -785,15 +809,15 @@ export const WIDGETS = {
         <div class="widget-player__frame" data-frame></div>
         <div class="widget-player__controls">
           <button class="icon-button widget-player__toggle" type="button" data-toggle aria-label="Reproducir" disabled>
-            ${icon('icon-play')}
+            ${icon("icon-play")}
           </button>
           <span class="widget-player__title" data-title>Sin vídeos en la cola</span>
         </div>
       </div>`;
 
-    const frame = node.querySelector('[data-frame]');
-    const toggle = node.querySelector('[data-toggle]');
-    const titleNode = node.querySelector('[data-title]');
+    const frame = node.querySelector("[data-frame]");
+    const toggle = node.querySelector("[data-toggle]");
+    const titleNode = node.querySelector("[data-title]");
 
     let ytPlayer = null;
     let playerReady = false;
@@ -820,17 +844,17 @@ export const WIDGETS = {
 
     const syncToggle = () => {
       const playing = lastState === YT_PLAYING;
-      toggle.innerHTML = playing ? icon('icon-pause') : icon('icon-play');
-      toggle.setAttribute('aria-label', playing ? 'Pausar el vídeo' : 'Reproducir el vídeo');
+      toggle.innerHTML = playing ? icon("icon-pause") : icon("icon-play");
+      toggle.setAttribute("aria-label", playing ? "Pausar el vídeo" : "Reproducir el vídeo");
     };
 
     const stopPlayer = () => {
       loadToken += 1;
       loading = false;
-      if (ytPlayer && typeof ytPlayer.destroy === 'function') {
+      if (ytPlayer && typeof ytPlayer.destroy === "function") {
         try {
           ytPlayer.destroy();
-        } catch (error) {
+        } catch {
           // The iframe is already gone: nothing else to release.
         }
       }
@@ -844,7 +868,7 @@ export const WIDGETS = {
     const ensurePlayer = (videoId) => {
       if (destroyed) return;
 
-      if (ytPlayer && playerReady && typeof ytPlayer.cueVideoById === 'function') {
+      if (ytPlayer && playerReady && typeof ytPlayer.cueVideoById === "function") {
         if (videoId !== currentVideoId) {
           currentVideoId = videoId;
           lastState = -1;
@@ -867,18 +891,18 @@ export const WIDGETS = {
       loading = true;
       currentVideoId = videoId;
       const token = ++loadToken;
-      frame.innerHTML = '<div data-player-target></div>';
+      frame.innerHTML = "<div data-player-target></div>";
 
       loadYouTubeApi()
         .then((YT) => {
           if (destroyed || token !== loadToken) return;
           loading = false;
-          const target = frame.querySelector('[data-player-target]');
+          const target = frame.querySelector("[data-player-target]");
           if (!target) return;
 
           ytPlayer = new YT.Player(target, {
-            width: '100%',
-            height: '100%',
+            width: "100%",
+            height: "100%",
             videoId,
             playerVars: {
               controls: 0,
@@ -906,20 +930,20 @@ export const WIDGETS = {
           fallbackMode = true;
           showIframe(videoId);
           toggle.disabled = true;
-          toggle.setAttribute('aria-label', 'Controles del reproductor embebido');
+          toggle.setAttribute("aria-label", "Controles del reproductor embebido");
         });
     };
 
     const paint = () => {
-      const stored = read('player', null);
+      const stored = read("player", null);
       const queue = stored && Array.isArray(stored.queue) ? stored.queue : [];
       const currentId = stored && stored.currentId ? stored.currentId : null;
       const current = queue.find((item) => item.id === currentId) || queue[0] || null;
 
       if (!current) {
         stopPlayer();
-        showPlaceholder('Sin vídeos en la cola');
-        titleNode.textContent = 'Añade un vídeo desde la app Reproductor';
+        showPlaceholder("Sin vídeos en la cola");
+        titleNode.textContent = "Añade un vídeo desde la app Reproductor";
         toggle.disabled = true;
         return;
       }
@@ -929,13 +953,13 @@ export const WIDGETS = {
       ensurePlayer(current.videoId);
     };
 
-    toggle.addEventListener('click', () => {
+    toggle.addEventListener("click", () => {
       if (!ytPlayer || !playerReady) return;
       if (lastState === YT_PLAYING) ytPlayer.pauseVideo();
       else ytPlayer.playVideo();
     });
 
-    const unsubscribe = subscribe('player', paint);
+    const unsubscribe = subscribe("player", paint);
     paint();
 
     return () => {
@@ -947,7 +971,7 @@ export const WIDGETS = {
 
   favorites(node) {
     const paint = () => {
-      const stored = read('favorites', []);
+      const stored = read("favorites", []);
       const favorites = Array.isArray(stored) ? stored : [];
 
       if (favorites.length === 0) {
@@ -972,17 +996,17 @@ export const WIDGETS = {
                     loading="lazy"
                     data-fallback="${FALLBACK_LOGO}"
                   />
-                  ${icon('icon-external', { size: 14, className: 'widget-favorite-card__external' })}
+                  ${icon("icon-external", { size: 14, className: "widget-favorite-card__external" })}
                 </span>
                 ${
                   favorite.name && favorite.name !== favorite.host
                     ? `<span class="widget-favorite-card__name">${escapeHtml(favorite.name)}</span>`
-                    : ''
+                    : ""
                 }
                 <span class="widget-favorite-card__host">${escapeHtml(favorite.host || favorite.url)}</span>
               </a>`
             )
-            .join('')}
+            .join("")}
         </div>`;
     };
 
@@ -990,17 +1014,17 @@ export const WIDGETS = {
     const onError = (event) => {
       const image = event.target;
       if (!(image instanceof HTMLImageElement) || image.dataset.fallbackUsed) return;
-      image.dataset.fallbackUsed = 'true';
+      image.dataset.fallbackUsed = "true";
       image.src = image.dataset.fallback;
     };
-    node.addEventListener('error', onError, true);
+    node.addEventListener("error", onError, true);
 
-    const unsubscribe = subscribe('favorites', paint);
+    const unsubscribe = subscribe("favorites", paint);
     paint();
 
     return () => {
       unsubscribe();
-      node.removeEventListener('error', onError, true);
+      node.removeEventListener("error", onError, true);
     };
   },
 
@@ -1014,13 +1038,13 @@ export const WIDGETS = {
               ([key, set]) => `
               <label class="check">
                 <input class="check__input" type="checkbox" name="${key}" checked />
-                <span class="check__box" aria-hidden="true">${icon('icon-check-circle', { size: 14 })}</span>
+                <span class="check__box" aria-hidden="true">${icon("icon-check-circle", { size: 14 })}</span>
                 <span class="check__label">${set.label}</span>
               </label>`
             )
-            .join('')}
+            .join("")}
         </fieldset>
-        <button class="button button--primary" type="submit">${icon('icon-refresh', { size: 16 })}<span>Generar</span></button>
+        <button class="button button--primary" type="submit">${icon("icon-refresh", { size: 16 })}<span>Generar</span></button>
       </form>
       <output class="widget-password__result" data-password-result>
         <span class="widget-password__value" data-password-value>Pulsa «Generar»</span>
@@ -1034,53 +1058,53 @@ export const WIDGETS = {
         <span class="widget-password__strength" data-password-strength>Aún sin generar</span>
       </output>`;
 
-    const form = node.querySelector('[data-password-form]');
-    const valueNode = node.querySelector('[data-password-value]');
-    const metaNode = node.querySelector('[data-password-meta]');
-    const strengthNode = node.querySelector('[data-password-strength]');
-    const meterBars = [...node.querySelectorAll('.widget-password__meter-bar')];
+    const form = node.querySelector("[data-password-form]");
+    const valueNode = node.querySelector("[data-password-value]");
+    const metaNode = node.querySelector("[data-password-meta]");
+    const strengthNode = node.querySelector("[data-password-strength]");
+    const meterBars = [...node.querySelectorAll(".widget-password__meter-bar")];
 
-    const stored = read('password-meta', null);
-    if (stored && typeof stored.entropy === 'number') {
+    const stored = read("password-meta", null);
+    if (stored && typeof stored.entropy === "number") {
       metaNode.textContent = `Última generación: ${stored.level} · ${stored.entropy} bits`;
       strengthNode.textContent = `Última generación: ${stored.level} · ${stored.entropy} bits`;
     }
 
-    form.addEventListener('submit', (event) => {
+    form.addEventListener("submit", (event) => {
       event.preventDefault();
       const data = new FormData(form);
 
       const result = generate({
         length: 20,
-        lower: data.has('lower'),
-        upper: data.has('upper'),
-        digits: data.has('digits'),
-        symbols: data.has('symbols'),
+        lower: data.has("lower"),
+        upper: data.has("upper"),
+        digits: data.has("digits"),
+        symbols: data.has("symbols"),
         avoidAmbiguous: false,
       });
 
       if (!result) {
-        announce('Selecciona al menos un tipo de carácter.');
+        announce("Selecciona al menos un tipo de carácter.");
         return;
       }
 
       const level = strengthFor(result.entropy);
-      const activeLevel = ['weak', 'fair', 'strong', 'excellent'].indexOf(level.tone);
+      const activeLevel = ["weak", "fair", "strong", "excellent"].indexOf(level.tone);
       valueNode.textContent = result.password;
       metaNode.textContent = `${level.label} · ${result.entropy} bits · ${result.pool} caracteres posibles`;
       meterBars.forEach((bar, index) => {
-        bar.dataset.filled = index <= activeLevel ? 'true' : 'false';
+        bar.dataset.filled = index <= activeLevel ? "true" : "false";
       });
       strengthNode.dataset.tone = level.tone;
       strengthNode.textContent = `${level.label} · ${result.entropy} bits de entropía`;
 
-      write('password-meta', {
+      write("password-meta", {
         entropy: result.entropy,
         length: result.password.length,
         level: level.label,
         at: Date.now(),
       });
-      announce('Contraseña generada');
+      announce("Contraseña generada");
     });
 
     return () => {};
@@ -1102,10 +1126,10 @@ export const WIDGETS = {
             <select class="field__control" data-type-heading>
               ${HEADING_FONTS.map(
                 (font) =>
-                  `<option value="${font.id}" ${font.id === state.headingFont ? 'selected' : ''}>${escapeHtml(
+                  `<option value="${font.id}" ${font.id === state.headingFont ? "selected" : ""}>${escapeHtml(
                     font.label
                   )}</option>`
-              ).join('')}
+              ).join("")}
             </select>
           </label>
           <label class="field">
@@ -1115,17 +1139,17 @@ export const WIDGETS = {
             </select>
           </label>
           <button class="button button--ghost widget-type__export" type="button" data-type-export>
-            ${icon('icon-copy', { size: 16 })}<span>Exportar CSS</span>
+            ${icon("icon-copy", { size: 16 })}<span>Exportar CSS</span>
           </button>
         </div>
       </div>`;
 
-    const meta = node.querySelector('[data-type-meta]');
-    const sample = node.querySelector('[data-type-sample]');
-    const example = node.querySelector('[data-type-example]');
-    const headingSelect = node.querySelector('[data-type-heading]');
-    const bodySelect = node.querySelector('[data-type-body]');
-    const exportButton = node.querySelector('[data-type-export]');
+    const meta = node.querySelector("[data-type-meta]");
+    const sample = node.querySelector("[data-type-sample]");
+    const example = node.querySelector("[data-type-example]");
+    const headingSelect = node.querySelector("[data-type-heading]");
+    const bodySelect = node.querySelector("[data-type-body]");
+    const exportButton = node.querySelector("[data-type-export]");
 
     const paint = () => {
       const current = readTypographyState();
@@ -1148,10 +1172,12 @@ export const WIDGETS = {
       write(TYPOGRAPHY_KEY, { ...readTypographyState(), ...patch });
     };
 
-    headingSelect.addEventListener('change', () => {
+    headingSelect.addEventListener("change", () => {
       const current = readTypographyState();
       const options = selectBodyFonts(headingSelect.value);
-      const bodyId = options.some((font) => font.id === current.bodyFont) ? current.bodyFont : options[0].id;
+      const bodyId = options.some((font) => font.id === current.bodyFont)
+        ? current.bodyFont
+        : options[0].id;
 
       save({ headingFont: headingSelect.value, bodyFont: bodyId });
       if (bodyId !== current.bodyFont) {
@@ -1159,16 +1185,16 @@ export const WIDGETS = {
       }
     });
 
-    bodySelect.addEventListener('change', () => {
+    bodySelect.addEventListener("change", () => {
       save({ bodyFont: bodySelect.value });
     });
 
-    exportButton.addEventListener('click', async () => {
+    exportButton.addEventListener("click", async () => {
       try {
         await copyText(buildTypographyCss(readTypographyState()));
-        announce('CSS de tipografía copiado');
-      } catch (error) {
-        announce('No se pudo copiar el CSS');
+        announce("CSS de tipografía copiado");
+      } catch {
+        announce("No se pudo copiar el CSS");
       }
     });
 
@@ -1193,27 +1219,30 @@ export const WIDGETS = {
               value="${harmony.id}"
             />
             <label class="segmented__label" for="widget-color-harmony-${harmony.id}">${escapeHtml(harmony.label)}</label>`
-          ).join('')}
+          ).join("")}
         </fieldset>
         <button class="button button--ghost widget-color__export" type="button" data-color-export>
-          ${icon('icon-copy', { size: 16 })}<span>Exportar CSS</span>
+          ${icon("icon-copy", { size: 16 })}<span>Exportar CSS</span>
         </button>
       </div>`;
 
-    const swatches = node.querySelector('[data-color-swatches]');
-    const meta = node.querySelector('[data-color-meta]');
-    const rules = node.querySelector('[data-color-rules]');
+    const swatches = node.querySelector("[data-color-swatches]");
+    const meta = node.querySelector("[data-color-meta]");
+    const rules = node.querySelector("[data-color-rules]");
 
     const paint = () => {
       const state = getColorState();
       const colors = buildHarmony(state);
-      const base = colors.find((color) => color.name === 'Base') || colors[0];
+      const base = colors.find((color) => color.name === "Base") || colors[0];
       const harmony = findHarmony(state.harmony);
 
       swatches.innerHTML = colors
         .slice(0, 5)
-        .map((color) => `<span class="widget-color__swatch" style="--widget-swatch:${color.hex}"></span>`)
-        .join('');
+        .map(
+          (color) =>
+            `<span class="widget-color__swatch" style="--widget-swatch:${color.hex}"></span>`
+        )
+        .join("");
 
       meta.innerHTML = `${escapeHtml(harmony.label)} · <span class="widget-color__base">${base.hex.toUpperCase()}</span>`;
 
@@ -1222,18 +1251,18 @@ export const WIDGETS = {
       });
     };
 
-    rules.addEventListener('change', (event) => {
+    rules.addEventListener("change", (event) => {
       const input = event.target.closest('input[name="widget-color-harmony"]');
       if (!input) return;
       write(COLOR_KEY, { ...getColorState(), harmony: input.value });
     });
 
-    node.querySelector('[data-color-export]').addEventListener('click', async () => {
+    node.querySelector("[data-color-export]").addEventListener("click", async () => {
       try {
         await copyText(buildColorCss(getColorState()));
-        announce('CSS de color copiado');
-      } catch (error) {
-        announce('No se pudo copiar el CSS');
+        announce("CSS de color copiado");
+      } catch {
+        announce("No se pudo copiar el CSS");
       }
     });
 
@@ -1245,49 +1274,50 @@ export const WIDGETS = {
     const paint = () => {
       const state = getTextState();
       const theme = findTextTheme(state.theme);
-      const excerpt = state.output.paragraphs[0] || '';
-      const title = state.includeTitle ? state.output.title : '';
+      const excerpt = state.output.paragraphs[0] || "";
+      const title = state.includeTitle ? state.output.title : "";
 
       if (!excerpt) {
-        node.innerHTML = '<p class="widget-empty">Genera tu primera sinopsis desde la app de texto.</p>';
+        node.innerHTML =
+          '<p class="widget-empty">Genera tu primera sinopsis desde la app de texto.</p>';
         return;
       }
 
       node.innerHTML = `
         <div class="widget-textgen">
           <p class="widget-textgen__meta">${escapeHtml(theme.label)} · ${state.output.paragraphs.length} párrafo${
-            state.output.paragraphs.length === 1 ? '' : 's'
+            state.output.paragraphs.length === 1 ? "" : "s"
           }</p>
-          ${title ? `<p class="widget-textgen__title">${escapeHtml(title)}</p>` : ''}
+          ${title ? `<p class="widget-textgen__title">${escapeHtml(title)}</p>` : ""}
           <p class="widget-textgen__excerpt">${escapeHtml(excerpt)}</p>
           <button class="button button--ghost widget-textgen__copy" type="button" data-copy-text>
-            ${icon('icon-copy', { size: 16 })}<span>Copiar texto</span>
+            ${icon("icon-copy", { size: 16 })}<span>Copiar texto</span>
           </button>
         </div>`;
 
-      node.querySelector('[data-copy-text]').addEventListener('click', async () => {
+      node.querySelector("[data-copy-text]").addEventListener("click", async () => {
         const current = getTextState();
         const parts = [];
         if (current.includeTitle && current.output.title) parts.push(current.output.title);
         parts.push(...current.output.paragraphs);
-        const text = parts.join('\n\n');
+        const text = parts.join("\n\n");
 
         if (!text) {
-          announce('Genera una sinopsis primero');
+          announce("Genera una sinopsis primero");
           return;
         }
 
         try {
           await copyText(text);
-          announce('Texto copiado al portapapeles');
-        } catch (error) {
-          announce('No se pudo copiar el texto');
+          announce("Texto copiado al portapapeles");
+        } catch {
+          announce("No se pudo copiar el texto");
         }
       });
     };
 
     paint();
-    return subscribe('text-generator', paint);
+    return subscribe("text-generator", paint);
   },
 };
 

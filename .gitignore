@@ -3,12 +3,20 @@ node_modules/
 
 # Directorios de compilación y producción
 dist/
+src/dist/
 
 # Archivos de caché y temporales de Vite
 .vite/
+
+# Archivos del sistema (macOS)
 .DS_Store
 
-# Logs de npm
+# Entorno local
+.env
+.env.*
+!.env.example
+
+# Logs
 npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*

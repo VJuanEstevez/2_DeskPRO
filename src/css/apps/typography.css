@@ -189,7 +189,7 @@
   color: var(--accent);
 }
 
-@media (max-width: 60rem) {
+@media (width <= 60rem) {
   .type__layout {
     grid-template-columns: 1fr;
   }
@@ -199,7 +199,7 @@
   }
 }
 
-@media (max-width: 47.99rem) {
+@media (width <= 47.99rem) {
   .type__headline {
     font-size: min(var(--specimen-heading-size, 3rem), 3.25rem);
   }
