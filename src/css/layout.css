@@ -82,6 +82,15 @@
   white-space: nowrap;
 }
 
+.app-install {
+  font-size: 0.8125rem;
+  padding: 0.4rem 0.7rem;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
 /* Location badge, pinned to the bottom right corner of the viewport. */
 .app-location {
   position: fixed;
@@ -932,6 +941,10 @@
   }
 
   .app-header__greeting {
+    display: none;
+  }
+
+  .app-install span {
     display: none;
   }
 

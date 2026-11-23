@@ -9,6 +9,12 @@
     content="DeskPRO, dashboard de productividad: calendario, pomodoro, clima, tareas, notas, reproductor, favoritos, generador de contraseñas, tipografía, color y textos." />
   <title>DeskPRO · Dashboard de productividad</title>
   <link rel="icon" type="image/svg+xml" href="./assets/logo/favicon.svg" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#0a0e14" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="DeskPRO" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
   <script>
     // Aplica el tema guardado antes del primer pintado para evitar parpadeos.
     try {
@@ -55,6 +61,12 @@
         <time class="app-header__time" id="header-time">--:--:--</time>
         <span class="app-header__date" id="header-date">&nbsp;</span>
       </div>
+      <button class="button button--ghost app-install" id="app-install" type="button" aria-label="Instalar app" hidden>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <use href="#icon-download"></use>
+        </svg>
+        <span>Instalar app</span>
+      </button>
     </div>
   </header>
 
@@ -248,6 +260,10 @@
       <symbol id="icon-copy" viewBox="0 0 24 24">
         <rect x="9" y="9" width="12" height="12" rx="2.5" />
         <path d="M5.5 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v.5" />
+      </symbol>
+      <symbol id="icon-download" viewBox="0 0 24 24">
+        <path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5" />
+        <path d="M4 17.5v2A1.5 1.5 0 0 0 5.5 21h13a1.5 1.5 0 0 0 1.5-1.5v-2" />
       </symbol>
       <symbol id="icon-refresh" viewBox="0 0 24 24">
         <path d="M20.5 12a8.5 8.5 0 1 1-2.49-6.01M20.5 3.5v5.5H15" />
