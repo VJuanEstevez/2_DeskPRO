@@ -41,6 +41,21 @@ export function getLocation() {
   return locationPromise;
 }
 
+/** Discards the cached result so the next getLocation() resolves again. */
+export function invalidateLocation() {
+  locationPromise = null;
+}
+
+/**
+ * Pins the session location to the city configured in settings. This takes
+ * precedence over geolocation until "Mi ubicación" invalidates it again.
+ * @param {string} city
+ */
+export function setLocationFromCity(city) {
+  locationPromise = resolveCity(city);
+  return locationPromise;
+}
+
 /**
  * Resolves a place name into coordinates using the Open-Meteo geocoder.
  * @param {string} city

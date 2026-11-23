@@ -89,22 +89,10 @@ export function mountNav() {
 
   const render = () => {
     const current = currentRoute();
-    const home = `
-        <li class="side-nav__item">
-          <a class="side-nav__link" href="#/" data-app="home" ${
-            current === '' ? 'aria-current="page"' : ''
-          }>
-            <svg class="icon side-nav__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <use href="#icon-home"></use>
-            </svg>
-            <span class="side-nav__label">Home</span>
-          </a>
-        </li>`;
 
-    list.innerHTML = home.concat(
-      selectApps()
-        .map(
-          (app) => `
+    list.innerHTML = selectApps()
+      .map(
+        (app) => `
         <li class="side-nav__item">
           <a class="side-nav__link" href="#/${app.id}" data-app="${app.id}" ${
             current === app.id ? 'aria-current="page"' : ''
@@ -115,9 +103,8 @@ export function mountNav() {
             <span class="side-nav__label">${app.label}</span>
           </a>
         </li>`
-        )
-        .join('')
-    );
+      )
+      .join('');
 
     bindTooltips(list);
   };

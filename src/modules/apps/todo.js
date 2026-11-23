@@ -1,7 +1,7 @@
 import '../../css/apps/todo.css';
 
 import { read, write, subscribe, announce } from '../store.js';
-import { icon, escapeHtml, uid, armAction } from '../ui.js';
+import { icon, escapeHtml, uid, armAction, clearableInput } from '../ui.js';
 
 const STORAGE_KEY = 'todo';
 const FILTERS = {
@@ -104,7 +104,9 @@ export default {
         <form class="todo__form" id="todo-form">
           <label class="field__label" for="todo-input">Nueva tarea</label>
           <div class="todo__row">
-            <input class="field__control" id="todo-input" name="text" type="text" maxlength="140" placeholder="Ej. Revisar el informe trimestral" autocomplete="off" required />
+            ${clearableInput(
+              '<input class="field__control" id="todo-input" name="text" type="text" maxlength="140" placeholder="Ej. Revisar el informe trimestral" autocomplete="off" required />'
+            )}
             <button class="button button--primary" type="submit">${icon('icon-plus')}<span>Añadir</span></button>
           </div>
         </form>

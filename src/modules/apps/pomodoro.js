@@ -17,13 +17,16 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 const listeners = new Set();
 let intervalId = null;
-let audioContext = null;
+let alarmTimerId = null;
+let alarmContext = null;
+const alarmOscillators = new Set();
 
 const state = {
   phase: 'focus',
   remaining: PHASES[0].minutes * 60,
   running: false,
   endsAt: 0,
+  alarm: false,
   completed: read(STORAGE_KEY, { completed: 0 }).completed || 0,
 };
 
@@ -98,7 +101,7 @@ function completePhase(countAsCompleted = true) {
   state.endsAt = 0;
 
   stopInterval();
-  playChime();
+  startAlarm();
   notify(true);
 
   const nextLabel = phaseById(state.phase).label;
@@ -120,34 +123,89 @@ function stopInterval() {
   intervalId = null;
 }
 
-function playChime() {
-  try {
-    const Context = window.AudioContext || window.webkitAudioContext;
-    if (!Context) return;
-    audioContext = audioContext || new Context();
-    const start = audioContext.currentTime;
+/**
+ * @param {AudioContext} context
+ * @param {number} start
+ */
+function beep(context, start) {
+  const oscillator = context.createOscillator();
+  const gain = context.createGain();
+  oscillator.type = 'sine';
+  oscillator.frequency.value = 880;
+  gain.gain.setValueAtTime(0.0001, start);
+  gain.gain.exponentialRampToValueAtTime(0.2, start + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.3);
+  oscillator.connect(gain);
+  gain.connect(context.destination);
+  oscillator.onended = () => alarmOscillators.delete(oscillator);
+  alarmOscillators.add(oscillator);
+  oscillator.start(start);
+  oscillator.stop(start + 0.35);
+}
 
-    [0, 0.28].forEach((offset) => {
-      const oscillator = audioContext.createOscillator();
-      const gain = audioContext.createGain();
-      oscillator.type = 'sine';
-      oscillator.frequency.value = 880;
-      gain.gain.setValueAtTime(0.0001, start + offset);
-      gain.gain.exponentialRampToValueAtTime(0.18, start + offset + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + offset + 0.3);
-      oscillator.connect(gain);
-      gain.connect(audioContext.destination);
-      oscillator.start(start + offset);
-      oscillator.stop(start + offset + 0.35);
-    });
-
-    window.setTimeout(() => {
-      if (audioContext && audioContext.state !== 'closed') audioContext.close();
-      audioContext = null;
-    }, 1200);
-  } catch (error) {
-    // Audio is a nicety: never break the timer because of it.
+function alarmPulse() {
+  if (!state.alarm || !alarmContext) return;
+  if (alarmContext.state === 'suspended') {
+    const resumed = alarmContext.resume();
+    if (resumed && typeof resumed.catch === 'function') resumed.catch(() => {});
   }
+  const start = alarmContext.currentTime;
+  beep(alarmContext, start);
+  beep(alarmContext, start + 0.32);
+}
+
+/**
+ * Starts a repeating alert that only stops when the user acknowledges it.
+ */
+export function startAlarm() {
+  if (state.alarm) return;
+
+  const Context = window.AudioContext || window.webkitAudioContext;
+  if (Context) {
+    try {
+      alarmContext = alarmContext || new Context();
+    } catch (error) {
+      alarmContext = null;
+    }
+  }
+
+  state.alarm = true;
+  alarmPulse();
+  alarmTimerId = window.setInterval(alarmPulse, 1600);
+  notify(true);
+}
+
+/**
+ * Silences the alert. This is the only way to disconnect the sound.
+ */
+export function stopAlarm() {
+  if (!state.alarm) return;
+
+  state.alarm = false;
+  if (alarmTimerId !== null) {
+    window.clearInterval(alarmTimerId);
+    alarmTimerId = null;
+  }
+
+  for (const oscillator of alarmOscillators) {
+    try {
+      oscillator.stop();
+    } catch (error) {
+      // The oscillator already ended: nothing left to stop.
+    }
+  }
+  alarmOscillators.clear();
+
+  if (alarmContext && alarmContext.state !== 'closed') {
+    const closing = alarmContext.close();
+    if (closing && typeof closing.catch === 'function') closing.catch(() => {});
+  }
+  alarmContext = null;
+  notify(true);
+}
+
+export function isAlarmActive() {
+  return state.alarm;
 }
 
 /**
@@ -234,6 +292,7 @@ function render() {
   const statusNode = root.querySelector('#pomodoro-status');
   const completedNode = root.querySelector('#pomodoro-completed');
   const nextNode = root.querySelector('#pomodoro-next');
+  const alarmNode = root.querySelector('#pomodoro-stop-alarm');
 
   if (timeNode) {
     timeNode.textContent = formatClock(state.remaining);
@@ -255,6 +314,7 @@ function render() {
     const nextPhase = phaseById(phase.next);
     nextNode.textContent = `Siguiente: ${nextPhase.label.toLowerCase()} (${nextPhase.minutes} min)`;
   }
+  if (alarmNode) alarmNode.hidden = !state.alarm;
 
   root.querySelectorAll('input[name="pomodoro-phase"]').forEach((input) => {
     input.checked = input.value === state.phase;
@@ -309,6 +369,9 @@ export default {
               <button class="button button--primary" id="pomodoro-toggle" type="button">${icon('icon-play')}<span>Iniciar</span></button>
               <button class="button button--ghost" id="pomodoro-reset" type="button">${icon('icon-refresh')}<span>Reiniciar</span></button>
               <button class="button button--ghost" id="pomodoro-skip" type="button">${icon('icon-chevron-right')}<span>Saltar</span></button>
+              <button class="button button--ghost pomodoro__stop-alarm" id="pomodoro-stop-alarm" type="button" hidden>
+                ${icon('icon-stop')}<span>Detener alarma</span>
+              </button>
             </div>
           </div>
 
@@ -342,6 +405,11 @@ export default {
 
     root.querySelector('#pomodoro-skip').addEventListener('click', () => {
       skipPhase();
+    });
+
+    root.querySelector('#pomodoro-stop-alarm').addEventListener('click', () => {
+      stopAlarm();
+      announce('Alarma detenida');
     });
 
     root.querySelectorAll('input[name="pomodoro-phase"]').forEach((input) => {

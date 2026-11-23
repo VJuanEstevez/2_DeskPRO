@@ -1,5 +1,5 @@
 import { getSettings, subscribeSettings } from './settings.js';
-import { getLocation } from './location.js';
+import { getLocation, setLocationFromCity } from './location.js';
 
 const timeFormatter = new Intl.DateTimeFormat('es-ES', {
   hour: '2-digit',
@@ -35,9 +35,11 @@ export function mountHeader() {
   tick();
   window.setInterval(tick, 1000);
 
-  subscribeSettings(() => {
+  subscribeSettings((settings) => {
     tick();
     placeNode.textContent = 'Buscando ubicación…';
+    // A city saved in settings wins over the GPS result cached earlier.
+    setLocationFromCity(settings.defaultCity);
     loadPlace(placeNode);
   });
 

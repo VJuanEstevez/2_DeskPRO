@@ -14,6 +14,84 @@ export function icon(name, options = {}) {
 }
 
 /**
+ * Wraps any text/search input markup with a native clear button. The wrapper
+ * keeps the button positioned inside the field without changing the input.
+ * @param {string} content input markup (or an .input-with-icon wrapper)
+ */
+export function clearableInput(content) {
+  return `<span class="input-with-clear">${content}<button class="input-clear" type="button" aria-label="Limpiar campo" hidden>${icon(
+    'icon-close',
+    { size: 14 }
+  )}</button></span>`;
+}
+
+const TOOLTIP_GAP = 8;
+const TOOLTIP_EDGE = 8;
+
+let tooltipNode = null;
+let tooltipAnchor = null;
+let tooltipDismissBound = false;
+
+function ensureTooltip() {
+  if (tooltipNode) return tooltipNode;
+  tooltipNode = document.createElement('div');
+  tooltipNode.className = 'app-tooltip';
+  tooltipNode.setAttribute('aria-hidden', 'true');
+  tooltipNode.hidden = true;
+  document.body.appendChild(tooltipNode);
+  return tooltipNode;
+}
+
+function bindTooltipDismiss() {
+  if (tooltipDismissBound) return;
+  tooltipDismissBound = true;
+
+  document.addEventListener('pointerdown', (event) => {
+    if (!tooltipNode || tooltipNode.hidden) return;
+    if (tooltipAnchor && event.target instanceof Node && tooltipAnchor.contains(event.target)) return;
+    hideTooltip();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') hideTooltip();
+  });
+  window.addEventListener('scroll', hideTooltip, true);
+  window.addEventListener('resize', hideTooltip);
+}
+
+/**
+ * Shows the shared, decorative tooltip next to an anchor element.
+ * @param {string} text
+ * @param {HTMLElement} anchor
+ */
+export function showTooltip(text, anchor) {
+  if (!text || !anchor) return;
+
+  const tooltip = ensureTooltip();
+  bindTooltipDismiss();
+  tooltip.textContent = text;
+  tooltipAnchor = anchor;
+  tooltip.hidden = false;
+
+  const anchorRect = anchor.getBoundingClientRect();
+  const tipRect = tooltip.getBoundingClientRect();
+
+  const left = Math.min(
+    Math.max(TOOLTIP_EDGE, anchorRect.left + anchorRect.width / 2 - tipRect.width / 2),
+    Math.max(TOOLTIP_EDGE, window.innerWidth - tipRect.width - TOOLTIP_EDGE)
+  );
+  let top = anchorRect.top - tipRect.height - TOOLTIP_GAP;
+  if (top < TOOLTIP_EDGE) top = anchorRect.bottom + TOOLTIP_GAP;
+
+  tooltip.style.left = `${Math.round(left)}px`;
+  tooltip.style.top = `${Math.round(top)}px`;
+}
+
+export function hideTooltip() {
+  if (tooltipNode) tooltipNode.hidden = true;
+  tooltipAnchor = null;
+}
+
+/**
  * @param {unknown} value
  */
 export function escapeHtml(value) {

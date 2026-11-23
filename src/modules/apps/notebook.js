@@ -1,7 +1,7 @@
 import '../../css/apps/notebook.css';
 
 import { read, write, subscribe, announce } from '../store.js';
-import { icon, escapeHtml, uid, armAction, formatRelativeTime } from '../ui.js';
+import { icon, escapeHtml, uid, armAction, formatRelativeTime, clearableInput } from '../ui.js';
 
 const STORAGE_KEY = 'notebook';
 const SAVE_DELAY = 500;
@@ -95,9 +95,9 @@ function renderEditor() {
   editor.innerHTML = `
     <div class="notebook__editor-head">
       <label class="sr-only" for="notebook-title">Título de la nota</label>
-      <input class="notebook__title-input" id="notebook-title" type="text" maxlength="80" placeholder="Título de la nota" value="${escapeHtml(
+      ${clearableInput(`<input class="notebook__title-input" id="notebook-title" type="text" maxlength="80" placeholder="Título de la nota" value="${escapeHtml(
         note.title
-      )}" />
+      )}" />`)}
       <button class="icon-button" id="notebook-delete" type="button" aria-label="Eliminar nota ${escapeHtml(note.title || 'sin título')}">
         ${icon('icon-trash')}
       </button>
@@ -170,10 +170,11 @@ export default {
           </div>
           <div class="notebook__toolbar">
             <label class="field__label sr-only" for="notebook-search">Buscar notas</label>
-            <div class="input-with-icon">
+            ${clearableInput(`
+            <span class="input-with-icon">
               ${icon('icon-search', { size: 16 })}
               <input class="field__control" id="notebook-search" type="search" placeholder="Buscar…" autocomplete="off" />
-            </div>
+            </span>`)}
             <button class="button button--primary" id="notebook-new" type="button">${icon('icon-plus')}<span>Nueva nota</span></button>
           </div>
         </header>

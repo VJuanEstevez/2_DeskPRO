@@ -84,6 +84,15 @@
   gap: var(--space-2);
 }
 
+.pomodoro__stop-alarm {
+  color: var(--danger);
+  border-color: var(--danger);
+
+  &[hidden] {
+    display: none;
+  }
+}
+
 .pomodoro__stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));

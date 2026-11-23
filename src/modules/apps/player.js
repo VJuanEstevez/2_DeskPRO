@@ -2,7 +2,7 @@ import '../../css/apps/player.css';
 
 import { read, write, subscribe, announce } from '../store.js';
 import { loadYouTubeApi, parseVideoId, fetchVideoTitle } from '../api/youtube.js';
-import { icon, escapeHtml, uid, armAction, formatClock } from '../ui.js';
+import { icon, escapeHtml, uid, armAction, formatClock, clearableInput } from '../ui.js';
 
 const STORAGE_KEY = 'player';
 const PLAYING = 1;
@@ -354,6 +354,7 @@ export default {
           <div class="field">
             <label class="field__label" for="player-url">Enlace de YouTube</label>
             <div class="player__row">
+              ${clearableInput(`
               <input
                 class="field__control"
                 id="player-url"
@@ -362,7 +363,7 @@ export default {
                 inputmode="url"
                 placeholder="https://www.youtube.com/watch?v=…"
                 autocomplete="off"
-              />
+              />`)}
               <button class="button button--primary" type="submit">${icon('icon-play')}<span>Reproducir</span></button>
               <button class="button button--ghost" type="button" id="player-enqueue">${icon('icon-plus')}<span>Añadir a la cola</span></button>
             </div>

@@ -179,6 +179,10 @@
   gap: var(--space-2);
 }
 
+.color__swatches--five {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
 .color__swatch-item {
   display: grid;
 }
@@ -449,6 +453,19 @@
 
   .color__swatches {
     grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr));
+  }
+
+  .color__swatches--five {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+
+    .color__swatch {
+      min-height: 6rem;
+      padding: var(--space-2);
+    }
+
+    .color__swatch-hsl {
+      display: none;
+    }
   }
 
   .color__token-button {

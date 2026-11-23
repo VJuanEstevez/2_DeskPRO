@@ -16,7 +16,6 @@
       "src_modules_location",
       "src_modules_location_geocodecache",
       "src_modules_location_getlocation",
-      "src_modules_location_resolvecity",
       "src_modules_location_reversecache",
       "src_modules_location_reversegeocode",
       "src_modules_nav",
@@ -46,44 +45,49 @@
       "src_modules_settings_selectapps",
       "src_modules_settings_settings_key",
       "src_modules_settings_subscribesettings",
+      "src_modules_store_subscribe",
       "src_modules_widgets_widgets"
     ],
     "1": [
-      "src_css_apps_favorites",
-      "src_css_apps_notebook",
-      "src_css_apps_todo",
-      "src_modules_apps_favorites",
-      "src_modules_apps_favorites_getfavorites",
-      "src_modules_apps_favorites_normalizeurl",
-      "src_modules_apps_favorites_render",
-      "src_modules_apps_favorites_savefavorites",
-      "src_modules_apps_notebook",
-      "src_modules_apps_notebook_findnote",
-      "src_modules_apps_notebook_flushpendingsave",
-      "src_modules_apps_notebook_getnotes",
-      "src_modules_apps_notebook_render",
-      "src_modules_apps_notebook_rendereditor",
-      "src_modules_apps_notebook_renderlist",
-      "src_modules_apps_notebook_savenotes",
-      "src_modules_apps_notebook_selectnote",
-      "src_modules_apps_todo",
-      "src_modules_apps_todo_filters",
-      "src_modules_apps_todo_getitems",
-      "src_modules_apps_todo_render",
-      "src_modules_apps_todo_saveitems",
+      "src_css_apps_password",
+      "src_css_apps_typography",
+      "src_modules_apps_password",
+      "src_modules_apps_password_character_sets",
+      "src_modules_apps_password_generate",
+      "src_modules_apps_password_randomchar",
+      "src_modules_apps_password_randomindex",
+      "src_modules_apps_password_render",
+      "src_modules_apps_password_shuffle",
+      "src_modules_apps_password_strength_levels",
+      "src_modules_apps_password_strengthfor",
+      "src_modules_apps_typography",
+      "src_modules_apps_typography_body_size_range",
+      "src_modules_apps_typography_clampnumber",
+      "src_modules_apps_typography_getstate",
+      "src_modules_apps_typography_heading_size_range",
+      "src_modules_apps_typography_line_height_range",
+      "src_modules_apps_typography_render",
+      "src_modules_apps_typography_savestate",
+      "src_modules_data_fonts",
+      "src_modules_data_fonts_body_fonts",
+      "src_modules_data_fonts_default_typography",
+      "src_modules_data_fonts_findbodyfont",
+      "src_modules_data_fonts_findheadingfont",
+      "src_modules_data_fonts_heading_fonts",
+      "src_modules_data_fonts_selectbodyfonts",
       "src_modules_store",
       "src_modules_store_emit",
       "src_modules_store_listeners",
       "src_modules_store_read",
-      "src_modules_store_subscribe",
       "src_modules_store_update",
       "src_modules_store_write",
-      "src_modules_ui",
-      "src_modules_ui_armaction",
-      "src_modules_ui_fallback_logo",
-      "src_modules_ui_formatrelativetime",
-      "src_modules_ui_icon",
-      "src_modules_ui_uid"
+      "src_modules_widgets",
+      "src_modules_widgets_bodyfontoptions",
+      "src_modules_widgets_buildtypographycss",
+      "src_modules_widgets_capitalize",
+      "src_modules_widgets_month_label",
+      "src_modules_widgets_readtypographystate",
+      "src_modules_widgets_weekdays_short"
     ],
     "2": [
       "package",
@@ -147,9 +151,40 @@
       "src_modules_data_cities",
       "src_modules_data_cities_findcity",
       "src_modules_data_cities_major_cities",
+      "src_modules_location_resolvecity",
       "src_modules_ui_escapehtml"
     ],
     "4": [
+      "src_css_apps_favorites",
+      "src_css_apps_notebook",
+      "src_css_apps_todo",
+      "src_modules_apps_favorites",
+      "src_modules_apps_favorites_getfavorites",
+      "src_modules_apps_favorites_normalizeurl",
+      "src_modules_apps_favorites_render",
+      "src_modules_apps_favorites_savefavorites",
+      "src_modules_apps_notebook",
+      "src_modules_apps_notebook_findnote",
+      "src_modules_apps_notebook_flushpendingsave",
+      "src_modules_apps_notebook_getnotes",
+      "src_modules_apps_notebook_render",
+      "src_modules_apps_notebook_rendereditor",
+      "src_modules_apps_notebook_renderlist",
+      "src_modules_apps_notebook_savenotes",
+      "src_modules_apps_notebook_selectnote",
+      "src_modules_apps_todo",
+      "src_modules_apps_todo_filters",
+      "src_modules_apps_todo_getitems",
+      "src_modules_apps_todo_render",
+      "src_modules_apps_todo_saveitems",
+      "src_modules_ui",
+      "src_modules_ui_armaction",
+      "src_modules_ui_fallback_logo",
+      "src_modules_ui_formatrelativetime",
+      "src_modules_ui_icon",
+      "src_modules_ui_uid"
+    ],
+    "5": [
       "src_css_apps_player",
       "src_modules_api_youtube",
       "src_modules_api_youtube_fetchvideotitle",
@@ -179,33 +214,6 @@
       "src_modules_apps_player_updatecontrols",
       "src_modules_store_announce"
     ],
-    "5": [
-      "src_css_apps_typography",
-      "src_modules_apps_pomodoro_getpomodorostate",
-      "src_modules_apps_pomodoro_phases",
-      "src_modules_apps_typography",
-      "src_modules_apps_typography_body_size_range",
-      "src_modules_apps_typography_clampnumber",
-      "src_modules_apps_typography_getstate",
-      "src_modules_apps_typography_heading_size_range",
-      "src_modules_apps_typography_line_height_range",
-      "src_modules_apps_typography_render",
-      "src_modules_apps_typography_savestate",
-      "src_modules_data_fonts",
-      "src_modules_data_fonts_body_fonts",
-      "src_modules_data_fonts_default_typography",
-      "src_modules_data_fonts_findbodyfont",
-      "src_modules_data_fonts_findheadingfont",
-      "src_modules_data_fonts_heading_fonts",
-      "src_modules_data_fonts_selectbodyfonts",
-      "src_modules_widgets",
-      "src_modules_widgets_bodyfontoptions",
-      "src_modules_widgets_buildtypographycss",
-      "src_modules_widgets_capitalize",
-      "src_modules_widgets_month_label",
-      "src_modules_widgets_readtypographystate",
-      "src_modules_widgets_weekdays_short"
-    ],
     "6": [
       "src_css_apps_color",
       "src_modules_apps_color",
@@ -230,18 +238,21 @@
       "src_modules_apps_color_rgbtohex",
       "src_modules_apps_color_schemes",
       "src_modules_apps_color_tonumber",
-      "src_modules_apps_color_tunetocontrast"
+      "src_modules_apps_color_tunetocontrast",
+      "src_modules_widgets_buildcolorcss"
     ],
     "7": [
       "src_css_apps_pomodoro",
       "src_modules_apps_pomodoro",
       "src_modules_apps_pomodoro_completephase",
+      "src_modules_apps_pomodoro_getpomodorostate",
       "src_modules_apps_pomodoro_isoduration",
       "src_modules_apps_pomodoro_listeners",
       "src_modules_apps_pomodoro_notify",
       "src_modules_apps_pomodoro_pausepomodoro",
       "src_modules_apps_pomodoro_persist",
       "src_modules_apps_pomodoro_phasebyid",
+      "src_modules_apps_pomodoro_phases",
       "src_modules_apps_pomodoro_playchime",
       "src_modules_apps_pomodoro_render",
       "src_modules_apps_pomodoro_resetpomodoro",
@@ -290,22 +301,10 @@
       "src_modules_apps_textgen_shuffle",
       "src_modules_data_text_themes",
       "src_modules_data_text_themes_findtexttheme",
-      "src_modules_data_text_themes_text_themes"
-    ],
-    "10": [
-      "src_css_apps_password",
-      "src_modules_apps_password",
-      "src_modules_apps_password_character_sets",
-      "src_modules_apps_password_generate",
-      "src_modules_apps_password_randomchar",
-      "src_modules_apps_password_randomindex",
-      "src_modules_apps_password_render",
-      "src_modules_apps_password_shuffle",
-      "src_modules_apps_password_strength_levels",
-      "src_modules_apps_password_strengthfor",
+      "src_modules_data_text_themes_text_themes",
       "src_modules_ui_copytext"
     ],
-    "11": [
+    "10": [
       "src_oxlintrc",
       "src_oxlintrc_categories",
       "src_oxlintrc_categories_correctness",
@@ -317,18 +316,17 @@
     ]
   },
   "cohesion": {
-    "0": 0.09468599033816426,
-    "1": 0.17647058823529413,
+    "0": 0.09565217391304348,
+    "1": 0.12010796221322537,
     "2": 0.07311827956989247,
-    "3": 0.16995073891625614,
-    "4": 0.20899470899470898,
-    "5": 0.16333333333333333,
-    "6": 0.19927536231884058,
-    "7": 0.22529644268774704,
+    "3": 0.1632183908045977,
+    "4": 0.1984126984126984,
+    "5": 0.20899470899470898,
+    "6": 0.18666666666666668,
+    "7": 0.19666666666666666,
     "8": 0.23529411764705882,
-    "9": 0.26373626373626374,
-    "10": 0.3090909090909091,
-    "11": 0.25
+    "9": 0.24761904761904763,
+    "10": 0.25
   },
   "gods": [
     {
@@ -384,10 +382,21 @@
   ],
   "surprises": [
     {
-      "source": "getStore()",
+      "source": "render()",
+      "target": "getLocation()",
+      "source_files": [
+        "src/modules/apps/weather.js",
+        "src/modules/location.js"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "getNotes()",
       "target": "read()",
       "source_files": [
-        "src/modules/apps/calendar.js",
+        "src/modules/apps/notebook.js",
         "src/modules/store.js"
       ],
       "confidence": "EXTRACTED",
@@ -395,21 +404,10 @@
       "why": "bridges separate communities"
     },
     {
-      "source": "saveStore()",
-      "target": "write()",
-      "source_files": [
-        "src/modules/apps/calendar.js",
-        "src/modules/store.js"
-      ],
-      "confidence": "EXTRACTED",
-      "relation": "calls",
-      "why": "bridges separate communities"
-    },
-    {
-      "source": "renderPanel()",
+      "source": "render()",
       "target": "announce()",
       "source_files": [
-        "src/modules/apps/calendar.js",
+        "src/modules/apps/notebook.js",
         "src/modules/store.js"
       ],
       "confidence": "EXTRACTED",
@@ -417,22 +415,22 @@
       "why": "bridges separate communities"
     },
     {
-      "source": "renderPanel()",
-      "target": "armAction()",
+      "source": "render()",
+      "target": "subscribe()",
       "source_files": [
-        "src/modules/apps/calendar.js",
-        "src/modules/ui.js"
+        "src/modules/apps/notebook.js",
+        "src/modules/store.js"
       ],
       "confidence": "EXTRACTED",
       "relation": "calls",
       "why": "bridges separate communities"
     },
     {
-      "source": "renderPanel()",
-      "target": "escapeHtml()",
+      "source": "renderEditor()",
+      "target": "announce()",
       "source_files": [
-        "src/modules/apps/calendar.js",
-        "src/modules/ui.js"
+        "src/modules/apps/notebook.js",
+        "src/modules/store.js"
       ],
       "confidence": "EXTRACTED",
       "relation": "calls",

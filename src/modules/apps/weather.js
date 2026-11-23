@@ -1,13 +1,12 @@
 import '../../css/apps/weather.css';
 
-import { getLocation, resolveCity } from '../location.js';
+import { getLocation, resolveCity, invalidateLocation } from '../location.js';
 import { MAJOR_CITIES } from '../data/cities.js';
-import { fetchForecast, fetchCurrentBatch, next24Hours, describeWeatherCode } from '../api/weather.js';
-import { icon, escapeHtml } from '../ui.js';
+import { fetchForecast, fetchCurrentBatch, describeWeatherCode } from '../api/weather.js';
+import { icon, escapeHtml, clearableInput } from '../ui.js';
 
 const TABS = [
   { id: 'summary', label: 'Resumen' },
-  { id: 'hourly', label: '24 horas' },
   { id: 'daily', label: '7 días' },
   { id: 'cities', label: 'Ciudades' },
 ];
@@ -17,6 +16,7 @@ let place = null;
 let activeTab = 'summary';
 let requestToken = 0;
 let forecastCache = null;
+let selectedDay = null;
 
 /**
  * @param {number} code
@@ -84,7 +84,6 @@ function paintPanel(forecast, token) {
   }
 
   if (activeTab === 'summary') panelNode.innerHTML = summaryMarkup(forecast);
-  else if (activeTab === 'hourly') panelNode.innerHTML = hourlyMarkup(forecast);
   else panelNode.innerHTML = dailyMarkup(forecast);
 }
 
@@ -137,38 +136,40 @@ function summaryMarkup(forecast) {
     </ul>`;
 }
 
-function hourlyMarkup(forecast) {
-  const hours = next24Hours(forecast);
+/**
+ * Hourly forecast for a single day, rendered as horizontal cards.
+ * @param {object} forecast
+ * @param {string} day 'YYYY-MM-DD'
+ */
+function dayHoursMarkup(forecast, day) {
+  const hourly = forecast.hourly || {};
+  const times = Array.isArray(hourly.time) ? hourly.time : [];
+  const hours = times
+    .map((time, index) => ({ time, index }))
+    .filter(({ time }) => time.slice(0, 10) === day);
 
-  if (hours.length === 0) return errorMarkup('No hay previsión por horas disponible.');
+  if (hours.length === 0) return '<p class="weather__day-empty">Sin previsión por horas para este día.</p>';
 
-  return `
-    <ol class="weather__hours">
-      ${hours
-        .map((hour) => {
-          const hourOfDay = Number(hour.time.slice(11, 13));
-          const badge = weatherBadge(hour.weatherCode, hourOfDay >= 6 && hourOfDay < 19);
-          return `<li class="weather__hour">
-            <span class="weather__hour-time">${escapeHtml(hour.time.slice(11, 16))}</span>
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#${badge.iconName}"></use></svg>
-            <span class="weather__hour-temp">${formatValue(hour.temperature, '°')}</span>
-            <span class="weather__hour-rain">${formatValue(hour.precipitation, '%')}</span>
-          </li>`;
-        })
-        .join('')}
-    </ol>`;
+  return `<ol class="weather__day-hours">
+    ${hours
+      .map(({ time, index }) => {
+        const hourOfDay = Number(time.slice(11, 13));
+        const badge = weatherBadge(hourly.weather_code[index], hourOfDay >= 6 && hourOfDay < 19);
+        return `<li class="weather__day-hour">
+          <span class="weather__day-hour-time">${escapeHtml(time.slice(11, 16))}</span>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#${badge.iconName}"></use></svg>
+          <span class="weather__day-hour-temp">${formatValue(hourly.temperature_2m[index], '°')}</span>
+          <span class="weather__day-hour-rain">${formatValue(hourly.precipitation_probability[index], '%')}</span>
+        </li>`;
+      })
+      .join('')}
+  </ol>`;
 }
 
 function dailyMarkup(forecast) {
   const daily = forecast.daily || {};
   const days = daily.time || [];
   if (days.length === 0) return errorMarkup('No hay previsión de 7 días disponible.');
-
-  const mins = days.map((_, index) => Number(daily.temperature_2m_min[index]));
-  const maxs = days.map((_, index) => Number(daily.temperature_2m_max[index]));
-  const globalMin = Math.min(...mins);
-  const globalMax = Math.max(...maxs);
-  const span = globalMax - globalMin || 1;
 
   return `
     <ul class="weather__days">
@@ -177,21 +178,25 @@ function dailyMarkup(forecast) {
           const date = new Date(`${day}T12:00:00`);
           const dayName = new Intl.DateTimeFormat('es-ES', { weekday: 'long' }).format(date);
           const badge = weatherBadge(daily.weather_code[index], true);
-          const left = ((mins[index] - globalMin) / span) * 100;
-          const width = ((maxs[index] - mins[index]) / span) * 100;
+          const expanded = selectedDay === day;
 
-          return `<li class="weather__day">
-            <span class="weather__day-name">${capitalize(dayName)}</span>
-            <span class="weather__day-date">${new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short' }).format(date)}</span>
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#${badge.iconName}"></use></svg>
-            <span class="weather__day-condition">${badge.label}</span>
-            <span class="weather__day-min">${formatValue(mins[index], '°')}</span>
-            <span class="weather__day-bar" aria-hidden="true"><span class="weather__day-range" style="left:${left.toFixed(
-              1
-            )}%; width:${width.toFixed(1)}%"></span></span>
-            <span class="weather__day-max">${formatValue(maxs[index], '°')}</span>
-            <span class="weather__day-rain">${formatValue(daily.precipitation_probability_max[index], '%')}<span class="sr-only"> de lluvia</span></span>
-            <span class="weather__day-wind">${formatValue(daily.wind_speed_10m_max[index], ' km/h')}</span>
+          return `<li class="weather__day-card${expanded ? ' is-expanded' : ''}">
+            <button class="weather__day" type="button" data-day="${escapeHtml(day)}" aria-expanded="${expanded}">
+              <span class="weather__day-name">${capitalize(dayName)}</span>
+              <span class="weather__day-date">${new Intl.DateTimeFormat('es-ES', {
+                day: 'numeric',
+                month: 'short',
+              }).format(date)}</span>
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#${badge.iconName}"></use></svg>
+              <span class="weather__day-condition">${badge.label}</span>
+              <span class="weather__day-min">${formatValue(daily.temperature_2m_min[index], '°')}</span>
+              <span class="weather__day-max">${formatValue(daily.temperature_2m_max[index], '°')}</span>
+              <span class="weather__day-rain">${formatValue(
+                daily.precipitation_probability_max[index],
+                '%'
+              )}<span class="sr-only"> de lluvia</span></span>
+            </button>
+            ${expanded ? dayHoursMarkup(forecast, day) : ''}
           </li>`;
         })
         .join('')}
@@ -254,6 +259,7 @@ function selectPlace(name, latitude, longitude) {
   if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
   place = { name, latitude, longitude };
   forecastCache = null;
+  selectedDay = null;
 
   // Any place change shows its own summary, even when picked from the city list.
   activeTab = 'summary';
@@ -274,10 +280,11 @@ export default {
           </div>
           <form class="weather__search" id="weather-search">
             <label class="field__label sr-only" for="weather-query">Buscar ciudad</label>
-            <div class="input-with-icon">
+            ${clearableInput(`
+            <span class="input-with-icon">
               ${icon('icon-search', { size: 16 })}
               <input class="field__control" id="weather-query" name="query" type="search" placeholder="Buscar ciudad…" autocomplete="off" list="weather-city-options" />
-            </div>
+            </span>`)}
             <datalist id="weather-city-options">
               ${MAJOR_CITIES.map((city) => `<option value="${escapeHtml(city.name)}"></option>`).join('')}
             </datalist>
@@ -305,9 +312,23 @@ export default {
     const locate = root.querySelector('#weather-locate');
     const panel = root.querySelector('#weather-panel');
 
-    // A single delegated listener keeps every error state retryable.
+    // A single delegated listener keeps retries and day expansion working
+    // after every repaint.
     panel.addEventListener('click', (event) => {
-      if (event.target.closest('[data-retry]')) render();
+      if (event.target.closest('[data-retry]')) {
+        render();
+        return;
+      }
+
+      const dayButton = event.target.closest('[data-day]');
+      if (!dayButton) return;
+
+      const day = dayButton.dataset.day;
+      selectedDay = selectedDay === day ? null : day;
+      if (forecastCache) paintPanel(forecastCache, requestToken);
+
+      const next = panel.querySelector(`[data-day="${day}"]`);
+      if (next) next.focus();
     });
 
     form.addEventListener('submit', (event) => {
@@ -330,6 +351,7 @@ export default {
     locate.addEventListener('click', () => {
       const panelNode = document.getElementById('weather-panel');
       if (panelNode) panelNode.innerHTML = loadingMarkup('Usando tu ubicación…');
+      invalidateLocation();
       getLocation().then((found) => {
         if (found.latitude === null || !Number.isFinite(found.latitude)) {
           if (panelNode) panelNode.innerHTML = errorMarkup('No pude obtener tu ubicación. Busca una ciudad por nombre.', {

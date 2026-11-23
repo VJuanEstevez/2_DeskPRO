@@ -1,11 +1,25 @@
 import { read, write, subscribe, announce } from './store.js';
-import { icon, escapeHtml, uid, armAction, copyText, formatClock, formatRelativeTime, toIsoDate, FALLBACK_LOGO } from './ui.js';
+import {
+  icon,
+  escapeHtml,
+  uid,
+  armAction,
+  copyText,
+  formatClock,
+  formatRelativeTime,
+  toIsoDate,
+  clearableInput,
+  showTooltip,
+  hideTooltip,
+  FALLBACK_LOGO,
+} from './ui.js';
 import {
   getPomodoroState,
   subscribePomodoro,
   startPomodoro,
   pausePomodoro,
   resetPomodoro,
+  stopAlarm,
   PHASES,
 } from './apps/pomodoro.js';
 import { getLocation } from './location.js';
@@ -142,7 +156,18 @@ export const WIDGETS = {
         if (isoDate === todayIso) classes.push('is-today');
         if (events.length > 0) classes.push('has-events');
 
-        cells.push(`<li class="${classes.join(' ')}" aria-hidden="true">${day}</li>`);
+        const tooltipText = events
+          .map((event) => `${event.time ? `${event.time} · ` : ''}${event.title}`)
+          .join(' | ');
+        const label = `${day} de ${capitalize(MONTH_LABEL.format(viewDate))}: ${tooltipText}`;
+        const body =
+          events.length > 0
+            ? `<button class="widget-calendar__day-button" type="button" data-events="${escapeHtml(
+                tooltipText
+              )}" aria-label="${escapeHtml(label)}">${day}</button>`
+            : String(day);
+
+        cells.push(`<li class="${classes.join(' ')}">${body}</li>`);
       }
 
       const summary =
@@ -164,7 +189,7 @@ export const WIDGETS = {
           <ol class="widget-calendar__weekdays" aria-hidden="true">
             ${WEEKDAYS_SHORT.map((day) => `<li>${day}</li>`).join('')}
           </ol>
-          <ol class="widget-calendar__grid" aria-hidden="true">${cells.join('')}</ol>
+          <ol class="widget-calendar__grid">${cells.join('')}</ol>
           <p class="widget-calendar__summary">${escapeHtml(summary)}</p>
         </div>`;
 
@@ -176,6 +201,15 @@ export const WIDGETS = {
       node.querySelector('[data-month-next]').addEventListener('click', () => {
         viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1);
         paint();
+      });
+
+      node.querySelectorAll('[data-events]').forEach((button) => {
+        const show = () => showTooltip(button.dataset.events, button);
+        button.addEventListener('pointerenter', show);
+        button.addEventListener('focus', show);
+        button.addEventListener('click', show);
+        button.addEventListener('pointerleave', hideTooltip);
+        button.addEventListener('blur', hideTooltip);
       });
     };
 
@@ -211,6 +245,9 @@ export const WIDGETS = {
           <button class="button button--ghost" type="button" data-reset>
             ${icon('icon-refresh', { size: 16 })}<span>Reiniciar</span>
           </button>
+          <button class="button button--ghost widget-pomodoro__alarm" type="button" data-stop-alarm hidden>
+            ${icon('icon-stop', { size: 16 })}<span>Detener alarma</span>
+          </button>
         </div>
       </div>`;
 
@@ -218,6 +255,7 @@ export const WIDGETS = {
     const timeNode = node.querySelector('[data-time]');
     const phaseNode = node.querySelector('[data-phase]');
     const toggle = node.querySelector('[data-toggle]');
+    const alarmButton = node.querySelector('[data-stop-alarm]');
 
     const paint = (snapshot) => {
       const state = snapshot || getPomodoroState();
@@ -236,6 +274,8 @@ export const WIDGETS = {
         const label = state.running ? 'Pausar' : 'Iniciar';
         toggle.innerHTML = `${state.running ? icon('icon-pause', { size: 16 }) : icon('icon-play', { size: 16 })}<span>${label}</span>`;
       }
+
+      alarmButton.hidden = !state.alarm;
     };
 
     toggle.addEventListener('click', () => {
@@ -246,6 +286,11 @@ export const WIDGETS = {
     node.querySelector('[data-reset]').addEventListener('click', () => {
       resetPomodoro();
       announce('Temporizador reiniciado');
+    });
+
+    alarmButton.addEventListener('click', () => {
+      stopAlarm();
+      announce('Alarma detenida');
     });
 
     paint();
@@ -303,6 +348,7 @@ export const WIDGETS = {
     node.innerHTML = `
       <form class="widget-form" data-todo-form>
         <label class="sr-only" for="widget-todo-input">Nueva tarea</label>
+        ${clearableInput(`
         <input
           class="field__control"
           id="widget-todo-input"
@@ -312,7 +358,7 @@ export const WIDGETS = {
           placeholder="Nueva tarea…"
           autocomplete="off"
           required
-        />
+        />`)}
         <button class="button button--primary" type="submit">${icon('icon-plus', { size: 16 })}<span>Añadir</span></button>
       </form>
       <ul class="widget-list" data-todo-list></ul>`;
@@ -381,11 +427,11 @@ export const WIDGETS = {
         .map((item) => {
           const body =
             item.id === editingId
-              ? `<input class="widget-list__edit" data-edit="${escapeHtml(
+              ? clearableInput(`<input class="widget-list__edit" data-edit="${escapeHtml(
                   item.id
                 )}" type="text" maxlength="140" value="${escapeHtml(item.text)}" aria-label="Editar tarea ${escapeHtml(
                   item.text
-                )}" />`
+                )}" />`)
               : `<label class="widget-list__label">
                   <input type="checkbox" data-id="${escapeHtml(item.id)}" />
                   <span>${escapeHtml(item.text)}</span>
@@ -623,6 +669,7 @@ export const WIDGETS = {
         node.innerHTML = `
           <form class="widget-form" data-note-form>
             <label class="sr-only" for="widget-note-input">Nueva nota</label>
+            ${clearableInput(`
             <input
               class="field__control"
               id="widget-note-input"
@@ -632,7 +679,7 @@ export const WIDGETS = {
               placeholder="Título de la nota…"
               autocomplete="off"
               required
-            />
+            />`)}
             <button class="button button--primary" type="submit">${icon('icon-plus', { size: 16 })}<span>Añadir</span></button>
           </form>
           <ul class="widget-list" data-note-list></ul>`;
@@ -978,15 +1025,25 @@ export const WIDGETS = {
       <output class="widget-password__result" data-password-result>
         <span class="widget-password__value" data-password-value>Pulsa «Generar»</span>
         <span class="widget-password__meta" data-password-meta></span>
+        <span class="password__meter widget-password__meter" aria-hidden="true">
+          <span class="password__meter-bar widget-password__meter-bar" data-level="0"></span>
+          <span class="password__meter-bar widget-password__meter-bar" data-level="1"></span>
+          <span class="password__meter-bar widget-password__meter-bar" data-level="2"></span>
+          <span class="password__meter-bar widget-password__meter-bar" data-level="3"></span>
+        </span>
+        <span class="widget-password__strength" data-password-strength>Aún sin generar</span>
       </output>`;
 
     const form = node.querySelector('[data-password-form]');
     const valueNode = node.querySelector('[data-password-value]');
     const metaNode = node.querySelector('[data-password-meta]');
+    const strengthNode = node.querySelector('[data-password-strength]');
+    const meterBars = [...node.querySelectorAll('.widget-password__meter-bar')];
 
     const stored = read('password-meta', null);
     if (stored && typeof stored.entropy === 'number') {
       metaNode.textContent = `Última generación: ${stored.level} · ${stored.entropy} bits`;
+      strengthNode.textContent = `Última generación: ${stored.level} · ${stored.entropy} bits`;
     }
 
     form.addEventListener('submit', (event) => {
@@ -1008,8 +1065,14 @@ export const WIDGETS = {
       }
 
       const level = strengthFor(result.entropy);
+      const activeLevel = ['weak', 'fair', 'strong', 'excellent'].indexOf(level.tone);
       valueNode.textContent = result.password;
       metaNode.textContent = `${level.label} · ${result.entropy} bits · ${result.pool} caracteres posibles`;
+      meterBars.forEach((bar, index) => {
+        bar.dataset.filled = index <= activeLevel ? 'true' : 'false';
+      });
+      strengthNode.dataset.tone = level.tone;
+      strengthNode.textContent = `${level.label} · ${result.entropy} bits de entropía`;
 
       write('password-meta', {
         entropy: result.entropy,
@@ -1148,7 +1211,7 @@ export const WIDGETS = {
       const harmony = findHarmony(state.harmony);
 
       swatches.innerHTML = colors
-        .slice(0, 4)
+        .slice(0, 5)
         .map((color) => `<span class="widget-color__swatch" style="--widget-swatch:${color.hex}"></span>`)
         .join('');
 

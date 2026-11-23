@@ -18,8 +18,16 @@
   border-radius: var(--radius-lg);
 }
 
-.calendar__month {
+.calendar__month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
   margin-bottom: var(--space-3);
+}
+
+.calendar__month {
+  flex: 1;
   text-align: center;
   text-transform: capitalize;
   color: var(--accent);

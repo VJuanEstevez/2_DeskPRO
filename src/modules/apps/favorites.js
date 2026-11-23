@@ -1,7 +1,7 @@
 import '../../css/apps/favorites.css';
 
 import { read, write, subscribe, announce } from '../store.js';
-import { icon, escapeHtml, uid, armAction, FALLBACK_LOGO } from '../ui.js';
+import { icon, escapeHtml, uid, armAction, clearableInput, FALLBACK_LOGO } from '../ui.js';
 
 const STORAGE_KEY = 'favorites';
 
@@ -121,7 +121,9 @@ export default {
         <form class="favorites__form" id="favorites-form">
           <div class="field">
             <label class="field__label" for="favorite-url">URL</label>
-            <input class="field__control" id="favorite-url" name="url" type="text" inputmode="url" placeholder="https://ejemplo.com" autocomplete="off" required />
+            ${clearableInput(
+              '<input class="field__control" id="favorite-url" name="url" type="text" inputmode="url" placeholder="https://ejemplo.com" autocomplete="off" required />'
+            )}
           </div>
           <button class="button button--primary" type="submit">${icon('icon-plus')}<span>Guardar</span></button>
         </form>

@@ -255,7 +255,7 @@
   &:hover {
     transform: translateY(-3px);
     border-color: var(--accent);
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-hover);
   }
 
   &:focus-within {
@@ -513,6 +513,20 @@
   border-radius: var(--radius-full);
 }
 
+.widget-calendar__day-button {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 1.75rem;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: inherit;
+  cursor: pointer;
+}
+
 .widget-calendar__day--outside {
   visibility: hidden;
 }
@@ -558,7 +572,7 @@
 
 .widget-pomodoro__ring {
   position: relative;
-  width: 9rem;
+  width: 10.35rem;
 }
 
 .widget-pomodoro__ring svg {
@@ -607,24 +621,37 @@
 
 .widget-pomodoro__actions {
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: var(--space-2);
+}
+
+.widget-pomodoro__alarm {
+  color: var(--danger);
+  border-color: var(--danger);
+
+  &[hidden] {
+    display: none;
+  }
 }
 
 /* Weather ----------------------------------------------------------------- */
 
 .widget-weather {
   display: grid;
+  place-self: center;
   justify-items: center;
   gap: var(--space-1);
+  width: 100%;
   padding-block: var(--space-2);
   text-align: center;
 }
 
 .widget-weather__icon {
-  width: 4rem;
-  height: 4rem;
+  width: 5rem;
+  height: 5rem;
   color: var(--accent);
 }
 
@@ -828,6 +855,52 @@
 .widget-password__meta {
   font-size: 0.75rem;
   color: var(--text-muted);
+}
+
+.widget-password__meter {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-1);
+}
+
+.widget-password__meter-bar {
+  height: 0.4rem;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-full);
+  transition: background var(--transition);
+}
+
+.widget-password__meter-bar[data-filled='true'][data-level='0'] {
+  background: var(--danger);
+}
+
+.widget-password__meter-bar[data-filled='true'][data-level='1'] {
+  background: var(--warning);
+}
+
+.widget-password__meter-bar[data-filled='true'][data-level='2'],
+.widget-password__meter-bar[data-filled='true'][data-level='3'] {
+  background: var(--success);
+}
+
+.widget-password__strength {
+  font-size: 0.75rem;
+  font-weight: 650;
+  color: var(--text-muted);
+}
+
+.widget-password__strength[data-tone='weak'] {
+  color: var(--danger);
+}
+
+.widget-password__strength[data-tone='fair'] {
+  color: var(--warning);
+}
+
+.widget-password__strength[data-tone='strong'],
+.widget-password__strength[data-tone='excellent'] {
+  color: var(--success);
 }
 
 /* --------------------------------------------------------------------------

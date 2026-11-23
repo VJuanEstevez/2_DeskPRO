@@ -401,6 +401,22 @@ export function buildNeutrals(state) {
   };
 }
 
+/**
+ * Token labels used both by the neutrals list and by "Seleccionar paleta".
+ * @param {ReturnType<typeof buildNeutrals>} palette
+ */
+function neutralRows(palette) {
+  return [
+    { id: 'background', name: 'Fondo', color: palette.background },
+    { id: 'surface', name: 'Superficie', color: palette.surface },
+    { id: 'surface-2', name: 'Superficie 2', color: palette.surface2 },
+    { id: 'border', name: 'Borde', color: palette.border, check: palette.checks.border },
+    { id: 'text', name: 'Texto', color: palette.text, check: palette.checks.text },
+    { id: 'muted', name: 'Texto secundario', color: palette.muted, check: palette.checks.muted },
+    { id: 'accent', name: 'Acento', color: palette.accent, check: palette.checks.accent },
+  ];
+}
+
 export default {
   meta: { title: 'Color' },
   render(root) {
@@ -520,6 +536,10 @@ export default {
                 <p class="field__hint">Tonos de baja saturación derivados del color base, con pares ajustados a WCAG 2.1 AA.</p>
               </div>
 
+              <button class="button button--ghost" id="color-copy-neutrals" type="button">
+                ${icon('icon-copy', { size: 16 })}<span>Seleccionar paleta</span>
+              </button>
+
               <fieldset class="segmented color__scheme" id="color-scheme">
                 <legend class="sr-only">Esquema de la interfaz</legend>
                 <input class="segmented__input" type="radio" name="color-scheme" id="color-scheme-dark" value="dark" ${
@@ -608,6 +628,7 @@ export default {
 
       harmonyName.textContent = harmony.label;
       harmonyNote.textContent = harmony.description;
+      swatches.classList.toggle('color__swatches--five', harmony.id === 'monochromatic');
       swatches.innerHTML = colors
         .map(
           (color) => `
@@ -630,15 +651,7 @@ export default {
 
     const paintNeutrals = () => {
       const palette = buildNeutrals(state);
-      const rows = [
-        { id: 'background', name: 'Fondo', color: palette.background },
-        { id: 'surface', name: 'Superficie', color: palette.surface },
-        { id: 'surface-2', name: 'Superficie 2', color: palette.surface2 },
-        { id: 'border', name: 'Borde', color: palette.border, check: palette.checks.border },
-        { id: 'text', name: 'Texto', color: palette.text, check: palette.checks.text },
-        { id: 'muted', name: 'Texto secundario', color: palette.muted, check: palette.checks.muted },
-        { id: 'accent', name: 'Acento', color: palette.accent, check: palette.checks.accent },
-      ];
+      const rows = neutralRows(palette);
 
       tokens.innerHTML = rows
         .map(
@@ -775,6 +788,19 @@ export default {
         announce(`Armonía ${harmony.label} copiada`);
       } catch (error) {
         announce('No se pudo copiar la armonía');
+      }
+    });
+
+    root.querySelector('#color-copy-neutrals').addEventListener('click', async () => {
+      const text = neutralRows(buildNeutrals(state))
+        .map((row) => `${row.name}: ${row.color.hex.toUpperCase()}`)
+        .join('\n');
+
+      try {
+        await copyText(text);
+        announce('Paleta de neutros copiada');
+      } catch (error) {
+        announce('No se pudo copiar la paleta');
       }
     });
 

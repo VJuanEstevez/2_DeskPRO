@@ -1,7 +1,17 @@
 import '../../css/apps/calendar.css';
 
 import { read, write, subscribe, announce } from '../store.js';
-import { icon, escapeHtml, uid, armAction, parseIsoDate, toIsoDate } from '../ui.js';
+import {
+  icon,
+  escapeHtml,
+  uid,
+  armAction,
+  parseIsoDate,
+  toIsoDate,
+  clearableInput,
+  showTooltip,
+  hideTooltip,
+} from '../ui.js';
 
 const STORAGE_KEY = 'calendar';
 const WEEKDAYS = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'];
@@ -55,7 +65,9 @@ function renderPanel() {
     <form class="event-form" id="event-form">
       <div class="field">
         <label class="field__label" for="event-title">Nuevo evento</label>
-        <input class="field__control" id="event-title" name="title" type="text" maxlength="80" placeholder="Ej. Reunión de equipo" autocomplete="off" required />
+        ${clearableInput(
+          '<input class="field__control" id="event-title" name="title" type="text" maxlength="80" placeholder="Ej. Reunión de equipo" autocomplete="off" required />'
+        )}
       </div>
       <div class="field event-form__row">
         <label class="field__label" for="event-time">Hora</label>
@@ -123,6 +135,9 @@ function renderGrid() {
   const title = document.getElementById('calendar-month');
   if (!table || !title) return;
 
+  // The grid is rebuilt on selection/month changes, so drop the old anchor.
+  hideTooltip();
+
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
   title.textContent = capitalize(MONTHS_LONG.format(viewDate));
@@ -142,6 +157,12 @@ function renderGrid() {
     const isSelected = isoDate === selectedDate;
     const isToday = isoDate === today;
     const accessibleDay = capitalize(DAY_LABEL.format(parseIsoDate(isoDate)));
+    const eventsText = events
+      .map((event) => `${event.time ? `${event.time} · ` : ''}${event.title}`)
+      .join(' | ');
+    const ariaLabel = `${accessibleDay}${
+      events.length > 0 ? `, ${events.length} evento${events.length === 1 ? '' : 's'}: ${eventsText}` : ''
+    }`;
 
     cells.push(`
       <td class="calendar__cell${isSelected ? ' is-selected' : ''}${isToday ? ' is-today' : ''}">
@@ -149,8 +170,9 @@ function renderGrid() {
           class="calendar__day"
           type="button"
           data-date="${isoDate}"
+          ${events.length > 0 ? `data-events="${escapeHtml(eventsText)}"` : ''}
           tabindex="${isSelected ? '0' : '-1'}"
-          aria-label="${accessibleDay}${events.length > 0 ? `, ${events.length} evento${events.length === 1 ? '' : 's'}` : ''}"
+          aria-label="${escapeHtml(ariaLabel)}"
         >
           <span class="calendar__day-number">${day}</span>
           ${events.length > 0 ? `<span class="calendar__badge">${events.length}</span>` : ''}
@@ -166,6 +188,16 @@ function renderGrid() {
   }
 
   table.querySelector('tbody').innerHTML = rows.join('');
+
+  // Event text is available on hover, keyboard focus and touch on every viewport.
+  table.querySelectorAll('[data-events]').forEach((button) => {
+    const show = () => showTooltip(button.dataset.events, button);
+    button.addEventListener('pointerenter', show);
+    button.addEventListener('focus', show);
+    button.addEventListener('click', show);
+    button.addEventListener('pointerleave', hideTooltip);
+    button.addEventListener('blur', hideTooltip);
+  });
 
   // Keep a single tab stop inside the grid even when the selection lives in another month.
   if (!table.querySelector('.calendar__day[tabindex="0"]')) {
@@ -201,19 +233,21 @@ export default {
             <h1 class="app__title">Calendario</h1>
           </div>
           <div class="calendar__controls">
-            <button class="icon-button" id="calendar-prev" type="button" aria-label="Mes anterior">
-              ${icon('icon-chevron-left')}
-            </button>
             <button class="button button--ghost" id="calendar-today" type="button">Hoy</button>
-            <button class="icon-button" id="calendar-next" type="button" aria-label="Mes siguiente">
-              ${icon('icon-chevron-right')}
-            </button>
           </div>
         </header>
 
         <div class="calendar__layout">
           <div class="calendar__main">
-            <h2 class="calendar__month" id="calendar-month"></h2>
+            <div class="calendar__month-nav">
+              <button class="icon-button" id="calendar-prev" type="button" aria-label="Mes anterior">
+                ${icon('icon-chevron-left')}
+              </button>
+              <h2 class="calendar__month" id="calendar-month"></h2>
+              <button class="icon-button" id="calendar-next" type="button" aria-label="Mes siguiente">
+                ${icon('icon-chevron-right')}
+              </button>
+            </div>
             <table class="calendar__table" id="calendar-table">
               <caption class="sr-only">Vista mensual del calendario</caption>
               <thead>

@@ -98,8 +98,13 @@
 
           <label class="field">
             <span class="field__label">Tu nombre (para el saludo)</span>
-            <input class="field__control" type="text" id="setting-name" name="name" maxlength="30"
-              placeholder="Ej. Juan" autocomplete="given-name" />
+            <span class="input-with-clear">
+              <input class="field__control" type="text" id="setting-name" name="name" maxlength="30"
+                placeholder="Ej. Juan" autocomplete="given-name" />
+              <button class="input-clear" type="button" aria-label="Limpiar campo" hidden>
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-close"></use></svg>
+              </button>
+            </span>
           </label>
 
           <label class="field">
@@ -117,8 +122,13 @@
 
           <label class="field">
             <span class="field__label">Ciudad por defecto</span>
-            <input class="field__control" type="text" id="setting-city" name="city" list="city-options"
-              placeholder="Ej. Madrid" autocomplete="off" />
+            <span class="input-with-clear">
+              <input class="field__control" type="text" id="setting-city" name="city" list="city-options"
+                placeholder="Ej. Madrid" autocomplete="off" />
+              <button class="input-clear" type="button" aria-label="Limpiar campo" hidden>
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icon-close"></use></svg>
+              </button>
+            </span>
             <datalist id="city-options"></datalist>
           </label>
           <p class="field__hint" id="setting-city-hint">Se usa si el navegador no comparte tu ubicación.</p>
